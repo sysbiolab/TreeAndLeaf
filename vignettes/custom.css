@@ -1,0 +1,32 @@
+
+.title {
+  margin: 1.2em 0 0.6em 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  padding: 0 0 0 0;
+  text-indent: 0;
+  margin: 1.2em 0 0.6em 0;
+}
+
+p {
+  padding: 0 0 0 0;
+}
+
+pre, code {
+  padding: 0 0 0 0;
+  margin: 0 0 0.5em 0;
+}
+
+P > img {
+  padding: 0 0 0 0;
+  margin: 35px auto 15px auto;
+}
+
+span.header-section-number {
+  width: 35px;
+}
+
+div#TOC > ul, ul {
+  padding: 0 15px 0 35px;
+}
