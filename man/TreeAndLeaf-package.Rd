@@ -19,7 +19,7 @@ dendrogram as a tree, in which the observations are represented by the leaves.
 \tabular{ll}{
 Package: \tab TreeAndLeaf\cr
 Type: \tab Package\cr
-Depends: \tab R (>= 3.3)\cr 
+Depends: \tab R (>= 4.0)\cr 
 Imports: \tab RedeR, igraph, ape \cr
 Suggests: \tab knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics, stringr,
 RColorBrewer\cr 
