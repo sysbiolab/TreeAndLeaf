@@ -1,29 +1,29 @@
 ##This function is used for argument checking
 tal.checks <- function(name, para){
-    if(name == "gg") {
+    if(identical(name, "gg")) {
         if(!igraph::is.igraph(para)){
-            stop("NOTE: 'gg' must be an igraph!", call.=FALSE)
+            stop("'gg' must be an igraph!", call.=FALSE)
         } else if (is.null(para$intnodes)){
-            stop("NOTE: 'gg' must be created by phylo2igraph() 
+            stop("'gg' must be created by phylo2igraph() 
                     or hclust2igraph()!", call.=FALSE)
         }
-    } else if(name == "theme"){
+    } else if(identical(name, "theme")){
         if(!is.singleInteger(para) || para > 5 || para < 1){
-            stop("NOTE: 'theme' must be an integer ranging from 1 to 5!", 
+            stop("'theme' must be an integer ranging from 1 to 5!", 
                     call.=FALSE)
         }
-    } else if(name == "cleanalias"){
+    } else if(identical(name, "cleanalias")){
         if(!is.singleLogical(para)){
-            stop("NOTE: 'cleanalias' must be a logical value!", call.=FALSE)
+            stop("'cleanalias' must be a logical value!", call.=FALSE)
         }
-    } else if(name == "obj"){
+    } else if(identical(name, "obj")){
         if(!is(para, "RedPort")){
-            stop("NOTE: 'obj' must be a RedPort object created by 
+            stop("'obj' must be a RedPort object created by 
                     RedeR::RedPort()!", call.=FALSE)
         }
-    } else if(name == "phy"){
+    } else if(identical(name, "phy")){
         if(!is(para, "phylo")){
-            stop("NOTE: 'phy' must be a 'phylo' object!", call.=FALSE)
+            stop("'phy' must be a 'phylo' object!", call.=FALSE)
         }
     }
 }
