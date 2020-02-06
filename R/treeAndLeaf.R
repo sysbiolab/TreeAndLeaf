@@ -51,7 +51,7 @@ treeAndLeaf <- function(obj, gg){
     root <- .findRoot(edgelist)
     #-- Start layout
     layout <- matrix(0, nrow = igraph::vcount(gg), ncol = 2,
-                        dimnames = list(igraph::V(gg)$name, c("x","y")))
+                     dimnames = list(igraph::V(gg)$name, c("x","y")))
     #-- Calculate the edges lengths for root
     elL <- .findSubTreeSizeLeft(root, edgelist)*10
     elR <- .findSubTreeSizeRight(root, edgelist)*10
@@ -78,17 +78,17 @@ treeAndLeaf <- function(obj, gg){
     }
     RedeR::.rederpost(obj, 'RedHandler.stopPaint')
     switch(size,
-            small = suppressMessages(RedeR::addGraph(obj, gg2, layout = layout,
+           small = suppressMessages(RedeR::addGraph(obj, gg2, layout = layout,
                                                     zoom = 14)),
-            medium = suppressMessages(RedeR::addGraph(obj, gg2, layout = layout,
-                                                        zoom = 7)),
-            large = suppressMessages(RedeR::addGraph(obj, gg2, layout = layout,
+           medium = suppressMessages(RedeR::addGraph(obj, gg2, layout = layout,
+                                                     zoom = 7)),
+           large = suppressMessages(RedeR::addGraph(obj, gg2, layout = layout,
                                                     zoom = 3)))
     switch(size,
-            small = RedeR::relax(obj, p1 = 50, p8 = 40, ps = TRUE, p9 = 10000),
-            medium = RedeR::relax(obj, p1 = 80, p2 = 120, p5 = 500, p8 = 60,
-                                    ps = TRUE, p9 = 10000),
-            large = RedeR::relax(obj, p1 = 100, p2 = 150, p5 = 500, p8 = 80,
+           small = RedeR::relax(obj, p1 = 50, p8 = 40, ps = TRUE, p9 = 10000),
+           medium = RedeR::relax(obj, p1 = 80, p2 = 120, p5 = 500, p8 = 60,
+                                 ps = TRUE, p9 = 10000),
+           large = RedeR::relax(obj, p1 = 100, p2 = 150, p5 = 500, p8 = 80,
                                 ps = TRUE, p9 = 10000))
     
     seconds <- ceiling(length(igraph::V(gg)$name)/25)+2
@@ -96,17 +96,17 @@ treeAndLeaf <- function(obj, gg){
             " seconds.")
     Sys.sleep(seconds)
     switch(size,
-            small = suppressMessages(RedeR::addGraph(obj, gg, layout = NULL,
+           small = suppressMessages(RedeR::addGraph(obj, gg, layout = NULL,
                                                     zoom = 14)),
-            medium = suppressMessages(RedeR::addGraph(obj, gg, layout = NULL,
-                                                        zoom = 7)),
-            large = suppressMessages(RedeR::addGraph(obj, gg, layout = NULL,
+           medium = suppressMessages(RedeR::addGraph(obj, gg, layout = NULL,
+                                                     zoom = 7)),
+           large = suppressMessages(RedeR::addGraph(obj, gg, layout = NULL,
                                                     zoom = 2)))
     switch(size,
-            small = RedeR::relax(obj, p1 = 50, p8 = 40, ps = TRUE, p9 = 10000),
-            medium = RedeR::relax(obj, p1 = 60, p5 = 100, p8 = 60, ps = TRUE,
-                                    p9 = 10000),
-            large = RedeR::relax(obj, p1 = 80, p2 = 50, p5 = 100, p8 = 100,
+           small = RedeR::relax(obj, p1 = 50, p8 = 40, ps = TRUE, p9 = 10000),
+           medium = RedeR::relax(obj, p1 = 60, p5 = 100, p8 = 60, ps = TRUE,
+                                 p9 = 10000),
+           large = RedeR::relax(obj, p1 = 80, p2 = 50, p5 = 100, p8 = 100,
                                 ps = TRUE, p9 = 10000))
     Sys.sleep(1)
     RedeR::.rederpost(obj, 'RedHandler.startPaint')
@@ -148,9 +148,9 @@ treeAndLeaf <- function(obj, gg){
         }
         if(get("count", envir = TaL) %% 3 == 2){
             coord.child1 <- c(layout[node, 1] + 0.5*elR,
-                                layout[node, 2]+ 0.5*elR)
+                              layout[node, 2]+ 0.5*elR)
             coord.child2 <- c(layout[node, 1] - 0.5*elL,
-                                layout[node, 2]- 0.5*elL)
+                              layout[node, 2]- 0.5*elL)
         }
         #-- Set the layout
         layout[children[1],] <- coord.child1
@@ -158,8 +158,7 @@ treeAndLeaf <- function(obj, gg){
         #-- Recursive call
         layout <- .setLayout(children[1], edgelist, layout, size, TaL = TaL)
         layout <- .setLayout(children[2], edgelist, layout, size, TaL = TaL)
-    }
-    else{
+    } else {
         return(layout)
     }
 }
@@ -191,8 +190,7 @@ treeAndLeaf <- function(obj, gg){
         if(left > length || right > length){
             if(left > right){
                 return(left)
-            }
-            else{
+            } else {
                 return(right)
             }
         }
@@ -203,7 +201,7 @@ treeAndLeaf <- function(obj, gg){
 
 .findRoot <- function(edgelist){
     return(unique(edgelist[which( is.na(match(edgelist[,1],
-                                                edgelist[,2])) == TRUE)]))
+                                              edgelist[,2])) == TRUE)]))
 }
 
 .countChildren <- function(node, edgelist, count = -1){
