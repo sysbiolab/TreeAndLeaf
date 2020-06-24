@@ -1,6 +1,6 @@
 ---
 title: 'TreeAndLeaf: an alternative to dendrogram visualization.'
-author: 'Leonardo Kume, Luis E A Rizzardi, Milena A Cardoso, Sheyla Trefflich, Mauro A A Castro'
+author: 'Leonardo W Kume, Luis E A Rizzardi, Milena A Cardoso, Sheyla Trefflich, Mauro A A Castro'
 date: "`r BiocStyle::doc_date()`"
 abstract: "**TreeAndLeaf** is a R-based package combined with **RedeR** and the **igraph** format
  to enhance the visualization of dendrograms."
@@ -326,7 +326,7 @@ data("spdata")
 The `spdata` object only shows data for eukaryotes with complete genomes
 available, an inner join has to be made to select only the species
 available in both datasets used. Therefore, it is necessary to check
-]which tips of the `phylo` object has a match with a row in `spdata`. Then,
+which tips of the `phylo` object has a match with a row in `spdata`. Then,
 the tree is plotted again only with the selected tips.
 
 ```{r}

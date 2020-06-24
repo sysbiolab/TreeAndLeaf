@@ -48,7 +48,7 @@ selecting the TreeAndLeaf package from the menu.
 }
 
 \author{
-Leonardo Kume, Luis E. A. Rizzardi, Milena A. Cardoso, Mauro A. A. Castro
+Leonardo W. Kume, Luis E. A. Rizzardi, Milena A. Cardoso, Mauro A. A. Castro
 }
 
 \references{
