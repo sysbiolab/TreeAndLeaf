@@ -22,13 +22,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(TreeAndLeaf)
-library(RedeR)
-library(RColorBrewer)
-library(igraph)
-library(ape)
-```
 
 # Overview
 
@@ -57,7 +50,7 @@ The workflow while using this package is depicted from **Figure 1**.
 
 
 <p align="center">
-<img width="1000" src="toy_vinheta.png">
+<img width="1000" src="overview.png">
 </p>
 **Figure 1**. A brief representation of what **TreeAndLeaf** functions are
 capable of. **(A,B)** The dendrogram in A was used to construct the graph
@@ -70,24 +63,39 @@ This document intends to guide you through the basics and give you ideas of how
 to use the functions to their full potential. Although **TreeAndLeaf** was
 created for systems biology application, it is not at all limited to this use.
 
-# USArrests - a small dendrogram example
+# Quick Start
+
+## Package requirements
 
 This section provides a quick and basic example using the R built-in dataframe
-`USArrests`, shown below. To know more about the info shown in this dataframe,
-use `?USArrests`. To use **TreeAndLeaf** functions to their full potential, it
-is recommended that your dataframe has rownames set before making the dendrogram,
-like this one has. 
+`USArrests`.
+First, the packages necessary to the analysis are loaded.
+
+```{r}
+library(TreeAndLeaf)
+library(RedeR)
+library(RColorBrewer)
+
+```
+
+## A small dendrogram example
+
+As stated above, `USArrests` is a dataframe readily available in R.
+To know more about the info shown in this dataframe, use `?USArrests`. 
+To use **TreeAndLeaf** functions to their full potential, it is recommended that
+your dataframe has rownames set before making the dendrogram, like this one has.
 
 ```{r echo=TRUE}
 dim(USArrests)
 head(USArrests)
 ```
 
+
 ## Building a dendrogram using R `hclust()`
 
 In order to build a dendrogram, you need to have a distance matrix of the
 observations. For example, the default “euclidean distance” method of 
-`dist()` can be used to generate one, and then use the “average” method of
+`dist()` can be used to generate a distance matrix, and then use the “average” method of
 `hclust()` to create a dendrogram. 
 
 ```{r echo=TRUE}
@@ -106,7 +114,7 @@ follow use `hclust2igraph()`.
 gg <- hclust2igraph(hc)
 ```
 
-## Formating the igraph for better visualization in RedeR
+## Formatting the igraph for better visualization in RedeR
 
 There is a quick formatting option in **TreeAndLeaf** package by using
 the function `formatTree()`, which is a theme function used to standardize
@@ -141,15 +149,15 @@ gg <- att.mapv(g = gg, dat = USArrests, refcol = 0)
 ```
 
 Now that the info is available, `att.setv()` changes the **igraph** attributes.
-The package RColorBrewer can be used to generate a palette for reference.
+The package **RColorBrewer** can be used to generate a palette for reference.
 Try `?addGraph` to see the options of **igraph** attributes **RedeR** can read.
 
 ```{r}
 pal <- brewer.pal(9, "Reds")
 gg <- att.setv(g = gg, from = "Murder", to = "nodeColor",
-                        cols = pal, nquant = 5)
+               cols = pal, nquant = 5)
 gg <- att.setv(g = gg, from = "UrbanPop", to = "nodeSize",
-                        xlim = c(50, 150, 1), nquant = 5)
+               xlim = c(50, 150, 1), nquant = 5)
 ```
 
 ## Calling the RedeR interface
@@ -170,8 +178,7 @@ generate the tree layout, plot it in **RedeR** interface and use functions
 to enhance appeal and distribution. 
 
 ```{r, eval = FALSE}
-treeAndLeaf(obj = rdp,
-            gg = gg)
+treeAndLeaf(obj = rdp, gg = gg)
 
 ```
 
@@ -180,15 +187,11 @@ names for `nodeColor` and `nodeSize`, it will automatically generate a **RedeR**
 readable legend, which can be plotted using the code below.
 
 ```{r, eval = FALSE}
-addLegend.color(obj = rdp,
-                        gg,
-                        title = "Murder Rate",
-                        position = "right")
+addLegend.color(obj = rdp, gg, title = "Murder Rate", 
+                position = "right")
 
-addLegend.size(obj = rdp,
-                        gg,
-                        title = "Urban Population Size",
-                        position = "bottomright")
+addLegend.size(obj = rdp, gg, title = "Urban Population Size",
+               position = "bottomright")
 ```
 
 ## Making manual adjustments
@@ -204,13 +207,22 @@ to adjust it while the relaxation algorithm is still running.
 All the different parameters can be changed and personalized throughout the
 steps to achieve the desired image.
 
-# A large dendrogram example - quakes
+# Large dendrogram case study
+
+## Context
 
 The **TreeAndLeaf** package is particularly useful when dealing with large
 dendrograms. This section uses the `quakes` built-in dataframe as an
 example. To know more about this data, check `?quakes`. Since each step was
 detailed in the first example, this one will focus on describing only features
 we were not able to see with `USArrests`.
+
+## Package and data requirements
+```{r}
+library(TreeAndLeaf)
+library(RedeR)
+library(RColorBrewer)
+```
 
 ```{r echo=TRUE}
 dim(quakes)
@@ -230,22 +242,29 @@ plot(hc)
 
 ## Converting and formating the igraph object
 
-As described before, the package functions `hclust2igraph()` is used for
-converting, `formatTree()` for initial attribute setting, `att.mapv()` for
-inserting the dataframe inside the **igraph** object and `att.setv()` to
-change graph characteristics.
+As described before, the package function `hclust2igraph()` is used for
+converting and function `formatTree()` is used for initial attribute 
+setting. From **RedeR**, `att.mapv()` is used for inserting the dataframe
+inside the **igraph** object and `att.setv()` to change graph characteristics.
+Package **RColorBrewer** is used in the variable `pal`, to generate a color palette.
 
 ```{r}
+# Converting hclust to igraph format
 gg <- hclust2igraph(hc)
+
+# Formatting the tree
 gg <- formatTree(gg, theme = 1, cleanalias = TRUE)
+
+# Mapping the data into the igraph object
 gg <- att.mapv(gg, quakes, refcol = 0)
 
+# Set attributes
 pal <- brewer.pal(9, "Greens")
 gg <- att.setv(gg, from = "mag", to = "nodeColor",
-                        cols = pal, nquant = 10)
+               cols = pal, nquant = 10)
 
 gg <- att.setv(gg, from = "depth", to = "nodeSize",
-                        xlim = c(240, 880, 1), nquant = 5)
+               xlim = c(240, 880, 1), nquant = 5)
 
 ```
 
@@ -267,7 +286,7 @@ desired image.
 
 ## Calling RedeR interface and plotting
 
-Repeat the step described in the first example.
+Repeat the step described in section *Quick Start*.
 
 ```{r, eval = FALSE}
 rdp <- RedPort()
@@ -276,32 +295,42 @@ resetd(rdp)
 ```
 
 ```{r, eval = FALSE}
+# Plotting the tree
 treeAndLeaf(rdp, gg)
-addLegend.color(obj = rdp,
-                        gg,
-                        title = "Richter Magnitude")
-addLegend.size(obj = rdp,
-                        gg,
-                        title = "Depth (km)")
+
+# Adding legend
+addLegend.color(obj = rdp, gg, title = "Richter Magnitude")
+addLegend.size(obj = rdp, gg, title = "Depth (km)")
 ```
 
 ## Making manual adjustments
 
 After manually solving some overlaps, you should be able to achieve the result
-shown below.
+shown below. On launching **RedeR**, the window *Dynamic layout settings* comes up, 
+and here the parameter *repulse radius* is fixed to achieve the graph as shown below.
 
 <p align="center">
 <img height="500" src="QuakesTree.png">
 </p>
 
-# Phylogenetic tree
+# Phylogenetic tree study case
+
+## Context
 
 The **TreeAndLeaf** package is also able to work with phylogenetic trees.
 To show how it works, we will apply these steps to plot a tree from
 **geneplast** package. It is a tree with 121 tips listing the eukaryotes
 in STRING-db, release 9.1.
 
-## Loading data
+## Package and data requirements
+
+```{r}
+library(TreeAndLeaf)
+library(RedeR)
+library(RColorBrewer)
+library(ape) # Analyses of Phylogenetics and Evolution
+library(igraph)
+```
 
 As mentioned, the tree can be loaded from **geneplast** package by running
 the code below.
@@ -330,16 +359,15 @@ which tips of the `phylo` object has a match with a row in `spdata`. Then,
 the tree is plotted again only with the selected tips.
 
 ```{r}
-#Accessory indexing
+# Accessory indexing 
 idx <- match(as.numeric(spdata$tax_id), as.numeric(phyloTree$tip.label))
 idx <- idx[!is.na(idx)]
 tokeep <- phyloTree$tip.label[idx]
 phyloTree$tip.label <- as.character(phyloTree$tip.label)
 
-#Remaking the tree
-pruned.tree <- 
-    drop.tip(phyloTree,phyloTree$tip.label[-match(tokeep,
-                                                        phyloTree$tip.label)])
+# Remaking the tree
+pruned.tree <- drop.tip(phyloTree, phyloTree$tip.label[-match(tokeep,
+                                                              phyloTree$tip.label)])
 ```
 
 
@@ -358,19 +386,19 @@ The following steps are the same as described before, so they won’t
 be explained here.
 
 ```{r}
-#Formatting of the graph
+# Formatting the tree
 tal.phylo <- formatTree(tal.phylo, theme = 4)
 
+# Mapping data to the igraph object
 tal.phylo <- att.mapv(g = tal.phylo, dat = spdata, refcol = 1)
 
-tal.phylo <- att.setv(g = tal.phylo, from = "genome_size_Mb",
-                                to = "nodeSize", 
-                                xlim = c(120, 250, 1), nquant = 5)
-
+# Setting attributes
 pal <- brewer.pal(9, "Purples")
+tal.phylo <- att.setv(g = tal.phylo, from = "genome_size_Mb",
+                      to = "nodeSize", xlim = c(120, 250, 1), nquant = 5)
 tal.phylo <- att.setv (g = tal.phylo, from = "proteins",
-                                to = "nodeColor",
-                                nquant = 5, cols = pal, na.col = "black")
+                       to = "nodeColor", nquant = 5,
+                       cols = pal, na.col = "black")
 ```
 
 ## Selecting names to be shown when plotting
@@ -381,29 +409,30 @@ species names, but not all of them, to prevent unreadability. For that, general
 **igraph** manipulation functions can be used.
 
 ```{r}
-#Changing the alias to show the names and making them invisible
+# Changing the alias to show the names and making them invisible
 idx <- match(V(tal.phylo)$nodeAlias, spdata$tax_id)
 V(tal.phylo)$nodeAlias <- spdata$sp_name[idx]
 V(tal.phylo)$nodeAlias[is.na(V(tal.phylo)$nodeAlias)] <- ""
 V(tal.phylo)$nodeFontSize <- 1
 
-#Randomly selecting some names to be shown
+# Randomly selecting some names to be shown
 set.seed(9)
-V(tal.phylo)$nodeFontSize[sample(
-    1:length(V(tal.phylo)$nodeFontSize), 50)] <- 100
-V(tal.phylo)$nodeFontSize[V(
-    tal.phylo)$name == "9606"] <- 100 #Homo sapiens
+V(tal.phylo)$nodeFontSize[sample(1:length(V(tal.phylo)$nodeFontSize), 50)] <- 100
+V(tal.phylo)$nodeFontSize[V(tal.phylo)$name == "9606"] <- 100 #Homo sapiens
 ```
 
 ## Plotting and making manual adjustments
 
 ```{r eval = FALSE}
-#Calling RedeR and plotting
+# Calling RedeR
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
 
-treeAndLeaf(rdp, tal.phylo)
+# Plotting
+treeAndLeaf(obj = rdp, gg = tal.phylo)
+
+# Adding Legend
 addLegend.size(rdp, tal.phylo, title = "Genome Size (Mb)")
 addLegend.color(rdp, tal.phylo, title = "Protein Count")
 ```
@@ -412,71 +441,86 @@ addLegend.color(rdp, tal.phylo, title = "Protein Count")
 <img height="500" src="PhyloPurple.png">
 </p>
 
-# Nonbinary species Tree from STRING-db v11.0
+# Nonbinary tree case study
+
+## Context
 
 Although **TreeAndLeaf** was written to work with binary trees, the package
 also works for some non binary diagrams such as the STRING-db species tree,
-release v11.0. Since all features were detailed on previous sections, this
+release 11.0.
+
+## Configurations and plotting
+
+Since all features were detailed on previous sections, this
 is just a demonstration and there will be no code explanation other than
-comments. This example uses the same dataframe downloaded from NCBI Genomes,
+comments. This example uses the same dataframe `spdata` downloaded from NCBI Genomes,
 applied on the previous example.
 
 ```{r}
-#Loading data
-data("spdata") #NCBI Genomes scraped info
-data("phylo_species") #STRING-db tree metadata
-data("phylo_tree") #STRING-db phylo object
+# Packages required
+library(TreeAndLeaf)
+library(RedeR)
+library(RColorBrewer)
+library(ape)
+library(igraph)
+library(geneplast)
+```
 
-#Remaking the tree with species inside spdata
+```{r}
+# Loading data
+data("spdata") # NCBI Genomes scraped info
+data("phylo_species") # STRING-db tree metadata
+data("phylo_tree") # STRING-db phylo object
+
+# Remaking the tree with species inside spdata
 idx <- match(as.numeric(spdata$tax_id), as.numeric(phylo_species$X...taxon_id))
 idx <- idx[!is.na(idx)]
 tokeep <- phylo_species$X...taxon_id[idx]
-pruned.tree <- 
-    drop.tip(phylo_tree,phylo_tree$tip.label[-match(tokeep,
-                                                        phylo_tree$tip.label)])
+pruned.tree <- drop.tip(phylo_tree,phylo_tree$tip.label[-match(tokeep, phylo_tree$tip.label)])
 
-#Converting phylo to igraph
+# Converting phylo to igraph
 tal.phy <- phylo2igraph(pruned.tree)
 
-#Formatting the tree
+# Formatting the tree
 tal.phy <- formatTree(gg = tal.phy, theme = 3)
 
+# Mapping data into the igraph object
 tal.phy <- att.mapv(g = tal.phy, dat = spdata, refcol = 1)
 
-tal.phy <- att.setv(g = tal.phy, from = "genome_size_Mb",
-                            to = "nodeSize",
-                            nquant = 5, xlim = c(200, 600, 1))
-
+# Setting attributes
 pal <- brewer.pal(9, "Blues")
-tal.phy <- att.setv(g = tal.phy, from = "proteins", to = "nodeColor", 
-                            nquant = 5, cols = pal, na.col = "black")
+tal.phy <- att.setv(g = tal.phy, from = "genome_size_Mb",
+                    to = "nodeSize", nquant = 5, xlim = c(200, 600, 1))
+tal.phy <- att.setv(g = tal.phy, from = "proteins", to = "nodeColor",
+                    nquant = 5, cols = pal, na.col = "black")
 
-#Randomly selecting names to be shown
+# Randomly selecting names to be shown
 set.seed(9)
 V(tal.phy)$nodeFontSize <- 1
-V(tal.phy)$nodeFontSize[sample(
-    1:length(V(tal.phy)$nodeFontSize), 80)] <- 300
+V(tal.phy)$nodeFontSize[sample(1:length(V(tal.phy)$nodeFontSize), 80)] <- 300
 V(tal.phy)$nodeFontSize[V(tal.phy)$name == 9606] <- 300
 
 idx <- match(V(tal.phy)$nodeAlias, spdata$tax_id)
 V(tal.phy)$nodeAlias <- spdata$sp_name[idx]
 V(tal.phy)$nodeAlias[is.na(V(tal.phy)$nodeAlias)] <- ""
-
 ```
 
 ```{r eval = FALSE}
-#Calling RedeR and plotting
+# Calling RedeR and plotting
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
 
+# Plotting the tree
 treeAndLeaf(rdp, tal.phy)
-addLegend.color(rdp, tal.phy)
-addLegend.size(rdp, tal.phy)
+
+# Adding legends
+addLegend.color(rdp, tal.phy, title = "Protein count")
+addLegend.size(rdp, tal.phy, title = "Genome size (Mb)")
 ```
 
 <p align="center">
-<img height="500" src="nBinPhylo.png">
+<img width="700" src="nBinPhylo.png">
 </p>
 
 
