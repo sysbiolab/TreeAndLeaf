@@ -189,7 +189,6 @@ readable legend, which can be plotted using the code below.
 ```{r, eval = FALSE}
 addLegend.color(obj = rdp, gg, title = "Murder Rate", 
                 position = "right")
-
 addLegend.size(obj = rdp, gg, title = "Urban Population Size",
                position = "bottomright")
 ```
@@ -240,7 +239,7 @@ hc <- hclust(dist(quakes))
 plot(hc)
 ```
 
-## Converting and formating the igraph object
+## Converting and formatting the igraph object
 
 As described before, the package function `hclust2igraph()` is used for
 converting and function `formatTree()` is used for initial attribute 
@@ -262,7 +261,6 @@ gg <- att.mapv(gg, quakes, refcol = 0)
 pal <- brewer.pal(9, "Greens")
 gg <- att.setv(gg, from = "mag", to = "nodeColor",
                cols = pal, nquant = 10)
-
 gg <- att.setv(gg, from = "depth", to = "nodeSize",
                xlim = c(240, 880, 1), nquant = 5)
 
@@ -313,7 +311,7 @@ and here the parameter *repulse radius* is fixed to achieve the graph as shown b
 <img height="500" src="QuakesTree.png">
 </p>
 
-# Phylogenetic tree study case
+# Phylogenetic tree case study
 
 ## Context
 
@@ -371,21 +369,15 @@ pruned.tree <- drop.tip(phyloTree, phyloTree$tip.label[-match(tokeep,
 ```
 
 
-## Converting the phylo object to igraph
+## Converting and formatting the igraph object
 
 For converting a phylogenetic tree to an **igraph** object, the package provides
 another function: `phylo2igraph()`.
 
 ```{r}
+# Converting phylo to igraph
 tal.phylo <- phylo2igraph(pruned.tree)
-```
 
-## Formatting and adding extra layers of information
-
-The following steps are the same as described before, so they won’t
-be explained here.
-
-```{r}
 # Formatting the tree
 tal.phylo <- formatTree(tal.phylo, theme = 4)
 
