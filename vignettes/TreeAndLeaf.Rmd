@@ -147,9 +147,9 @@ Try `?addGraph` to see the options of **igraph** attributes **RedeR** can read.
 ```{r}
 pal <- brewer.pal(9, "Reds")
 gg <- att.setv(g = gg, from = "Murder", to = "nodeColor",
-                        cols = pal, nquant = 5)
+               cols = pal, nquant = 5)
 gg <- att.setv(g = gg, from = "UrbanPop", to = "nodeSize",
-                        xlim = c(50, 150, 1), nquant = 5)
+               xlim = c(50, 150, 1), nquant = 5)
 ```
 
 ## Calling the RedeR interface
@@ -180,15 +180,9 @@ names for `nodeColor` and `nodeSize`, it will automatically generate a **RedeR**
 readable legend, which can be plotted using the code below.
 
 ```{r, eval = FALSE}
-addLegend.color(obj = rdp,
-                        gg,
-                        title = "Murder Rate",
-                        position = "right")
+addLegend.color(obj = rdp, gg, title = "Murder Rate", position = "right")
 
-addLegend.size(obj = rdp,
-                        gg,
-                        title = "Urban Population Size",
-                        position = "bottomright")
+addLegend.size(obj = rdp, gg, title = "Urban Population Size", position = "bottomright")
 ```
 
 ## Making manual adjustments
@@ -241,11 +235,8 @@ gg <- formatTree(gg, theme = 1, cleanalias = TRUE)
 gg <- att.mapv(gg, quakes, refcol = 0)
 
 pal <- brewer.pal(9, "Greens")
-gg <- att.setv(gg, from = "mag", to = "nodeColor",
-                        cols = pal, nquant = 10)
-
-gg <- att.setv(gg, from = "depth", to = "nodeSize",
-                        xlim = c(240, 880, 1), nquant = 5)
+gg <- att.setv(gg, from = "mag", to = "nodeColor", cols = pal, nquant = 10)
+gg <- att.setv(gg, from = "depth", to = "nodeSize", xlim = c(240, 880, 1), nquant = 5)
 
 ```
 
@@ -277,12 +268,8 @@ resetd(rdp)
 
 ```{r, eval = FALSE}
 treeAndLeaf(rdp, gg)
-addLegend.color(obj = rdp,
-                        gg,
-                        title = "Richter Magnitude")
-addLegend.size(obj = rdp,
-                        gg,
-                        title = "Depth (km)")
+addLegend.color(obj = rdp, gg, title = "Richter Magnitude")
+addLegend.size(obj = rdp, gg, title = "Depth (km)")
 ```
 
 ## Making manual adjustments
@@ -337,9 +324,7 @@ tokeep <- phyloTree$tip.label[idx]
 phyloTree$tip.label <- as.character(phyloTree$tip.label)
 
 #Remaking the tree
-pruned.tree <- 
-    drop.tip(phyloTree,phyloTree$tip.label[-match(tokeep,
-                                                        phyloTree$tip.label)])
+pruned.tree <- drop.tip(phyloTree,phyloTree$tip.label[-match(tokeep, phyloTree$tip.label)])
 ```
 
 
@@ -363,14 +348,11 @@ tal.phylo <- formatTree(tal.phylo, theme = 4)
 
 tal.phylo <- att.mapv(g = tal.phylo, dat = spdata, refcol = 1)
 
-tal.phylo <- att.setv(g = tal.phylo, from = "genome_size_Mb",
-                                to = "nodeSize", 
-                                xlim = c(120, 250, 1), nquant = 5)
-
 pal <- brewer.pal(9, "Purples")
-tal.phylo <- att.setv (g = tal.phylo, from = "proteins",
-                                to = "nodeColor",
-                                nquant = 5, cols = pal, na.col = "black")
+tal.phylo <- att.setv(g = tal.phylo, from = "genome_size_Mb",
+                      to = "nodeSize", xlim = c(120, 250, 1), nquant = 5)
+tal.phylo <- att.setv (g = tal.phylo, from = "proteins", 
+                       to = "nodeColor", nquant = 5, cols = pal, na.col = "black")
 ```
 
 ## Selecting names to be shown when plotting
@@ -381,24 +363,23 @@ species names, but not all of them, to prevent unreadability. For that, general
 **igraph** manipulation functions can be used.
 
 ```{r}
-#Changing the alias to show the names and making them invisible
+# Changing the alias to show the names and making them invisible
 idx <- match(V(tal.phylo)$nodeAlias, spdata$tax_id)
 V(tal.phylo)$nodeAlias <- spdata$sp_name[idx]
 V(tal.phylo)$nodeAlias[is.na(V(tal.phylo)$nodeAlias)] <- ""
 V(tal.phylo)$nodeFontSize <- 1
 
-#Randomly selecting some names to be shown
+# Randomly selecting some names to be shown
 set.seed(9)
-V(tal.phylo)$nodeFontSize[sample(
-    1:length(V(tal.phylo)$nodeFontSize), 50)] <- 100
+V(tal.phylo)$nodeFontSize[sample(1:length(V(tal.phylo)$nodeFontSize), 50)] <- 100
 V(tal.phylo)$nodeFontSize[V(
-    tal.phylo)$name == "9606"] <- 100 #Homo sapiens
+    tal.phylo)$name == "9606"] <- 100 # Homo sapiens
 ```
 
 ## Plotting and making manual adjustments
 
 ```{r eval = FALSE}
-#Calling RedeR and plotting
+# Calling RedeR and plotting
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
@@ -422,40 +403,36 @@ comments. This example uses the same dataframe downloaded from NCBI Genomes,
 applied on the previous example.
 
 ```{r}
-#Loading data
+# Loading data
 data("spdata") #NCBI Genomes scraped info
 data("phylo_species") #STRING-db tree metadata
 data("phylo_tree") #STRING-db phylo object
 
-#Remaking the tree with species inside spdata
+# Remaking the tree with species inside spdata
 idx <- match(as.numeric(spdata$tax_id), as.numeric(phylo_species$X...taxon_id))
 idx <- idx[!is.na(idx)]
 tokeep <- phylo_species$X...taxon_id[idx]
-pruned.tree <- 
-    drop.tip(phylo_tree,phylo_tree$tip.label[-match(tokeep,
-                                                        phylo_tree$tip.label)])
+pruned.tree <- drop.tip(phylo_tree,phylo_tree$tip.label[-match(tokeep, phylo_tree$tip.label)])
 
-#Converting phylo to igraph
+# Converting phylo to igraph
 tal.phy <- phylo2igraph(pruned.tree)
 
-#Formatting the tree
+# Formatting the tree
 tal.phy <- formatTree(gg = tal.phy, theme = 3)
 
 tal.phy <- att.mapv(g = tal.phy, dat = spdata, refcol = 1)
 
 tal.phy <- att.setv(g = tal.phy, from = "genome_size_Mb",
-                            to = "nodeSize",
-                            nquant = 5, xlim = c(200, 600, 1))
+                    to = "nodeSize", nquant = 5, xlim = c(200, 600, 1))
 
 pal <- brewer.pal(9, "Blues")
-tal.phy <- att.setv(g = tal.phy, from = "proteins", to = "nodeColor", 
-                            nquant = 5, cols = pal, na.col = "black")
+tal.phy <- att.setv(g = tal.phy, from = "proteins", 
+                    to = "nodeColor", nquant = 5, cols = pal, na.col = "black")
 
-#Randomly selecting names to be shown
+# Randomly selecting names to be shown
 set.seed(9)
 V(tal.phy)$nodeFontSize <- 1
-V(tal.phy)$nodeFontSize[sample(
-    1:length(V(tal.phy)$nodeFontSize), 80)] <- 300
+V(tal.phy)$nodeFontSize[sample(1:length(V(tal.phy)$nodeFontSize), 80)] <- 300
 V(tal.phy)$nodeFontSize[V(tal.phy)$name == 9606] <- 300
 
 idx <- match(V(tal.phy)$nodeAlias, spdata$tax_id)
@@ -465,7 +442,7 @@ V(tal.phy)$nodeAlias[is.na(V(tal.phy)$nodeAlias)] <- ""
 ```
 
 ```{r eval = FALSE}
-#Calling RedeR and plotting
+# Calling RedeR and plotting
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
