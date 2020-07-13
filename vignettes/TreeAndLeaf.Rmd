@@ -206,7 +206,7 @@ to adjust it while the relaxation algorithm is still running.
 All the different parameters can be changed and personalized throughout the
 steps to achieve the desired image.
 
-# Large dendrogram case study
+# Case Study 1: a large dendrogram
 
 ## Context
 
@@ -311,7 +311,7 @@ and here the parameter *repulse radius* is fixed to achieve the graph as shown b
 <img height="500" src="QuakesTree.png">
 </p>
 
-# Phylogenetic tree case study
+# Case Study 2: a phylogenetic tree
 
 ## Context
 
@@ -433,7 +433,7 @@ addLegend.color(rdp, tal.phylo, title = "Protein Count")
 <img height="500" src="PhyloPurple.png">
 </p>
 
-# Nonbinary tree case study
+# Case Study 3: a nonbinary tree
 
 ## Context
 
