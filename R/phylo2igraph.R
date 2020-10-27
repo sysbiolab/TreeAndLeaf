@@ -2,7 +2,7 @@
 #'
 #' Function for converting a phylo object to an igraph.
 #'
-#' @param phy A phylo object with labeled tips <phylo>.
+#' @param phy A phylo object with labeled tips.
 #' 
 #' @return An igraph object.
 #'
