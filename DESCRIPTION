@@ -10,6 +10,6 @@ Imports: RedeR, igraph, ape, methods
 Suggests: knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics, stringr, RColorBrewer, geneplast
 License: Artistic-2.0
 Encoding: UTF-8
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 biocViews: Infrastructure, GraphAndNetwork, Software, Network, Visualization, DataRepresentation

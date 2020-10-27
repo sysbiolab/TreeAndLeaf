@@ -7,7 +7,7 @@
 phylo2igraph(phy)
 }
 \arguments{
-\item{phy}{A phylo object with labeled tips <phylo>.}
+\item{phy}{A phylo object with labeled tips.}
 }
 \value{
 An igraph object.

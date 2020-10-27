@@ -4,7 +4,9 @@
 \name{phylo_species}
 \alias{phylo_species}
 \title{Species metadata for the strings tree from STRING-db v11.0}
-\format{An object of class \code{"data.frame"}}
+\format{
+An object of class \code{"data.frame"}
+}
 \usage{
 data(phylo_species)
 }

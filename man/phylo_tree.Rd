@@ -4,7 +4,9 @@
 \name{phylo_tree}
 \alias{phylo_tree}
 \title{Species tree from STRING-db v11.0}
-\format{An object of class \code{"phylo"}}
+\format{
+An object of class \code{"phylo"}
+}
 \usage{
 data(phylo_tree)
 }

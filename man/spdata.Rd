@@ -4,7 +4,9 @@
 \name{spdata}
 \alias{spdata}
 \title{Genome statistical data from eukaryotes with complete genome}
-\format{An object of class \code{"data.frame"}}
+\format{
+An object of class \code{"data.frame"}
+}
 \usage{
 data(spdata)
 }
