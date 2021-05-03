@@ -1,13 +1,13 @@
 Package: TreeAndLeaf
 Type: Package
-Title: An alternative to dendrogram visualization and insertion of multiple layers of information
-Version: 1.3.0
-Description: TreeAndLeaf package comes as an alternative to solve problems regarding dendrogram plotting, such as the lack of space when the dendrogram is too large and the need for adding more layers of information. It treats a whole dendrogram as a tree, in which the observations are represented by the leaves.
+Title: Displaying binary trees with focus on dendrogram leaves
+Version: 1.3.1
+Description: The TreeAndLeaf package combines unrooted and force-directed graph algorithms in order to layout binary trees, aiming to represent multiple layers of information onto dendrogram leaves.
 Author: Leonardo W. Kume, Luis E. A. Rizzardi, Milena A. Cardoso, Mauro A. A. Castro
 Maintainer: Milena A. Cardoso <milenandreuzo@gmail.com>
-Depends: R (>= 4.0)
-Imports: RedeR, igraph, ape, methods
-Suggests: knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics, stringr, RColorBrewer, geneplast
+Depends: R(>= 4.0)
+Imports: RedeR(>= 1.38.1), igraph, ape
+Suggests: knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics, stringr, geneplast, ggtree, ggplot2, dplyr, dendextend, RColorBrewer
 License: Artistic-2.0
 Encoding: UTF-8
 RoxygenNote: 7.1.1

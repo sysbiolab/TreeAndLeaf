@@ -3,7 +3,7 @@
 \docType{data}
 \name{phylo_species}
 \alias{phylo_species}
-\title{Species metadata for the strings tree from STRING-db v11.0}
+\title{Species metadata from STRING-db v11}
 \format{
 An object of class \code{"data.frame"}
 }
@@ -11,13 +11,11 @@ An object of class \code{"data.frame"}
 data(phylo_species)
 }
 \description{
-Species metadata for phylo_tree object from STRING-db website.
-Available visiting download page under Accessory Data.
-Version: 11.0
+Species metadata used in a phylo object.
 }
 \references{
-STRING: functional protein association networks.
-Retrieved August 15, 2019, from
-https://string-db.org/
+Szklarczyk D. et al. STRING v11: protein-protein association networks with 
+increased coverage, supporting functional discovery in genome-wide 
+experimental datasets. Nucleic Acids Res. 47:D607-613, 2019.
 }
 \keyword{datasets}

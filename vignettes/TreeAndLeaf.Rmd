@@ -1,19 +1,17 @@
 ---
-title: 'TreeAndLeaf: an alternative to dendrogram visualization.'
-author: 'Leonardo W Kume, Luis E A Rizzardi, Milena A Cardoso, Sheyla Trefflich, Mauro A A Castro'
+title: '*TreeAndLeaf*: A graph layout strategy for binary trees with focus on the leaves'
+author: 'Milena A Cardoso, Luis E A Rizzardi, Leonardo W Kume, Sheyla Trefflich, Clarice Groeneveld, Mauro A A Castro'
 date: "`r BiocStyle::doc_date()`"
-abstract: "**TreeAndLeaf** is a R-based package combined with **RedeR** and the **igraph** format
- to enhance the visualization of dendrograms."
+abstract: "The **TreeAndLeaf** package combines tree and force-directed layout algorithms for drawing binary trees, aiming to represent multiple layers of information onto the leaves."
 package: "`r BiocStyle::pkg_ver('TreeAndLeaf')`"
 output:
     BiocStyle::html_document:
         css: custom.css
 vignette: >
-  %\VignetteIndexEntry{TreeAndLeaf: an alternative to dendrogram visualization.}
+  %\VignetteIndexEntry{TreeAndLeaf: an graph layout to dendrograms.}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -22,504 +20,548 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 # Overview
 
-**TreeAndLeaf** is an R-based package for better visualization of dendrograms
-and phylogenetic trees. The package changes the way a dendrogram is viewed.
-Through the use of the **igraph** format and the package **RedeR**, the
-nodes are rearranged and the hierarchical relations are kept intact, resulting
-in an image that is easier to read and can be enhanced with additional 
-layers of information.
+A dendrogram diagram displays binary trees focused on representing 
+hierarchical relations between the tree elements. A dendrogram contains 
+nodes, branches (edges), a root, and leaves (**Figure 1A**). The root is where 
+the branches and nodes come from, indicating the direction to the leaves, 
+*i.e.*, the terminal nodes.
 
+Most of the space of a dendrogram layout is used to arrange branches and inner 
+nodes, with limited space to the leaves. For large dendrograms, the leaf 
+labels are often squeezed to fit into small slots. Therefore, a dendrogram 
+may not provide the best layout when the information to be displayed should 
+highlight the leaves.
 
-The classical dendrogram is a limited format in two ways. Firstly, it only
-displays one type of information, which is the hierarchical relation between
-the data. Secondly, it is limited by its size, the larger the database, the
-less readable it becomes. The **TreeAndLeaf** enhances space distribution
-because it uses all directions, allowing for an improved visualization and
-a better image for publications. The package **RedeR**, used for plotting 
-in this package, uses a force-based relaxation algorithm that helps nodes
-in avoiding overlaps. By implementing **RedeR** and the **igraph** format,
-the package allows for customization of the dendrogram inserting multiple layers
-of information to be represented by edge widths and colors, nodes colors, nodes
-sizes, line color, etc. The package also includes a fast formatting option for
-quick and exploratory analysis usage. Therefore, the package is designed to make
-plotting dendrograms more useful, less confusing and more productive.
-The workflow while using this package is depicted from **Figure 1**.
-
+The **TreeAndLeaf** package aims to improve the visualization of the dendrogram 
+leaves by combining tree and force-directed layout algorithms, shifting the 
+focus of analysis to the leaves (**Figure 1B**). The package's workflow is 
+summarized in **Figure 1C**.
 
 <p align="center">
 <img width="1000" src="overview.png">
 </p>
-**Figure 1**. A brief representation of what **TreeAndLeaf** functions are
-capable of. **(A,B)** The dendrogram in A was used to construct the graph
-representation shown in B. **(C)** Workflow summary. The main input data
-consists of a distance matrix, which is used to generate a dendrogram.
-The **TreeAndLeaf** package transforms the dendrogram into a graph
-representation.
-
-This document intends to guide you through the basics and give you ideas of how
-to use the functions to their full potential. Although **TreeAndLeaf** was
-created for systems biology application, it is not at all limited to this use.
+**Figure 1**. **TreeAndLeaf** workflow summary. **(A,B)** The dendrogram in A 
+is used to construct the graph in B. **(C)** The main input for the **TreeAndLeaf** 
+package consists of a dendrogram, and then the package transforms the dendrogram 
+into a graph representation. The finest graph layout is achieved by a two-steps 
+process, starting with an unrooted tree diagram, which is subsequently relaxed 
+by a force-directed algorithm applied to the terminal nodes of the tree. The 
+final *tree-and-leaf* layout varies depending on the initial state, which can be 
+obtained by other tree layout algorithms (see *section 3* for examples using 
+*ggtree* layouts to setup the initial state).
 
 # Quick Start
 
-## Package requirements
+This section provides a basic example using the R built-in `USArrests` dataset. 
+The `USArrests` is a dataframe available in the user's workspace. To know more 
+about this dataframe, please query `?USArrests` in the R console. We will build 
+a dendrogram from the `USArrests` dataset, then transform the dendrogram into 
+a *tree-and-leaf* diagram, and the result will be visualized in the **RedeR** 
+application.
 
-This section provides a quick and basic example using the R built-in dataframe
-`USArrests`.
-First, the packages necessary to the analysis are loaded.
+## Package and data requirements
 
-```{r}
-library(TreeAndLeaf)
-library(RedeR)
-library(RColorBrewer)
+```{r, eval=TRUE, message=FALSE}
+#-- Libraries required in this section:
+#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+# BiocManager::install(c("TreeAndLeaf","RedeR"))
+# install.packages(c("igraph","RColorBrewer"))
 
+#-- Load packages
+library("TreeAndLeaf")
+library("RedeR")
+library("igraph")
+library("RColorBrewer")
 ```
 
-## A small dendrogram example
-
-As stated above, `USArrests` is a dataframe readily available in R.
-To know more about the info shown in this dataframe, use `?USArrests`. 
-To use **TreeAndLeaf** functions to their full potential, it is recommended that
-your dataframe has rownames set before making the dendrogram, like this one has.
-
-```{r echo=TRUE}
+```{r, eval=TRUE, message=FALSE}
+#-- Check data
 dim(USArrests)
 head(USArrests)
 ```
 
+## Building a dendrogram example
 
-## Building a dendrogram using R `hclust()`
+In order to build a dendrogram from the `USArrests` dataset, we need a distance 
+matrix. We will use the default "euclidean distance" method from the `dist()` 
+function, and then the "average" method from `hclust()` function to create the 
+dendrogram.
 
-In order to build a dendrogram, you need to have a distance matrix of the
-observations. For example, the default “euclidean distance” method of 
-`dist()` can be used to generate a distance matrix, and then use the “average” method of
-`hclust()` to create a dendrogram. 
-
-```{r echo=TRUE}
+```{r, eval=TRUE, message=FALSE}
 hc <- hclust(dist(USArrests), "ave")
-plot(hc)
+plot(hc, main="Dendrogram for the 'USArrests' dataset",
+     xlab="", sub="")
 ```
 
-## Converting your hclust object to an igraph object
+## Converting the *hclust* object into a *tree-and-leaf* object
 
-This is a rather simple but important step. Since **TreeAndLeaf**
-and **RedeR** work with **igraph** objects, a function is provided to
-convert an **hclust** dendrogram into an **igraph**. For that, simply
-follow use `hclust2igraph()`.
+The `treeAndLeaf` function will transform the *hclust* into an *igraph* object,
+including some basic graph attributes to display in the **RedeR** application.
 
-```{r}
-gg <- hclust2igraph(hc)
+```{r, eval=FALSE}
+#--- Get the tree-and-leaf
+tal <- treeAndLeaf(hc)
 ```
 
-## Formatting the igraph for better visualization in RedeR
+## Setting graph attributes
 
-There is a quick formatting option in **TreeAndLeaf** package by using
-the function `formatTree()`, which is a theme function used to standardize
-node sizes and colors. This is an important step because the tree will
-have leaf nodes (the ones representing your observations) and non-leaf nodes
-(the ones representing bifurcations of the dendrogram), and this function
-makes the last ones invisible to achieve the desired appearance and proper
-relaxation. A description of available themes can be consulted at `?formatTree`.
+The `att.mapv()` function can be used to add external annotations to an *igraph* 
+object, for example, mapping new variables to the graph vertices. We will add 
+all `USArrests` variables to the `tal` object. To map one object to another 
+it is essential to use the same mapping IDs, set by the `refcol` parameter, 
+which points to a column in the input annotation dataset. In this example, 
+`refcol = 0` indicates that the `USArrests` rownames will be used as 
+mapping IDs. To check the IDs in the *igraph* vertices, please type 
+`V(tal)$name` in the R console.
 
-```{r}
-gg <- formatTree(gg = gg, theme = 5)
+```{r, eval=FALSE}
+#--- Map attributes to the tree-and-leaf
+#Note: 'refcol = 0' indicates that 'dat' rownames will be used as mapping IDs
+tal <- att.mapv(g = tal, dat = USArrests, refcol = 0)
 ```
 
-Now, the tree-and-leaf diagram is ready to be shown in **RedeR** with `treeAndLeaf()`,
-or you can have layers of information added to it, as shown below.
+Now we use the `att.setv()` wrapper function to set attributes in the 
+*tree-and-leaf* diagram. To see all attributes available to display in the 
+**RedeR** application, please type `?addGraph` in the R console. The graph
+attributes can also be customized following **igraph** syntax rules.
 
-## Inserting additional layers of information
-
-**RedeR** offers a set of functions to manipulate **igraph** attributes
-according to the parameters the application reads.
-
-
-First, `att.mapv()` is used to insert the dataframe inside the **igraph** object
-and make it available for setting node attributes. In this step, it is crucial
-that the `refcol` points to a column with the same content as `hc$labels`.
-
-
-In this case, `refcol = 0` indicates the rownames of the dataframe.
-
-```{r}
-gg <- att.mapv(g = gg, dat = USArrests, refcol = 0)
-```
-
-Now that the info is available, `att.setv()` changes the **igraph** attributes.
-The package **RColorBrewer** can be used to generate a palette for reference.
-Try `?addGraph` to see the options of **igraph** attributes **RedeR** can read.
-
-```{r}
+```{r, eval=FALSE}
+#--- Set graph attributes using the 'att.setv' wrapper function
 pal <- brewer.pal(9, "Reds")
-gg <- att.setv(g = gg, from = "Murder", to = "nodeColor",
-               cols = pal, nquant = 5)
-gg <- att.setv(g = gg, from = "UrbanPop", to = "nodeSize",
-               xlim = c(50, 150, 1), nquant = 5)
+tal <- att.setv(g = tal, from = "Murder", to = "nodeColor", 
+                cols = pal, nquant = 5)
+tal <- att.setv(g = tal, from = "UrbanPop", to = "nodeSize",
+                xlim = c(10, 50, 5), nquant = 5)
+
+#--- Set graph attributes using 'att.addv' and 'att.adde' functions
+tal <- att.addv(tal, "nodeFontSize", value = 15, index = V(tal)$isLeaf)
+tal <- att.adde(tal, "edgeWidth", value = 3)
 ```
 
-## Calling the RedeR interface
+## Plotting a *tree-and-leaf* diagram
 
-With the **igraph** ready to be visualized, you need to invoke **RedeR**
-interface. This might take some seconds.
+The next steps will call the **RedeR** application, and then display the 
+*tree-and-leaf* diagram in an interactive R/Java interface. The initial layout
+will show an unrooted tree diagram, which will be subsequently relaxed by a 
+force-directed algorithm applied to the terminal nodes of the tree.
 
-```{r, eval = FALSE}
+```{r, eval=FALSE}
+#--- Call RedeR application
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
 ```
 
-## Calling `treeAndLeaf()` and adding legends
+```{r, eval=FALSE}
+#--- Send the tree-and-leaf to the interactive R/Java interface
+addGraph(obj = rdp, g = tal, zoom=75)
 
-This is **TreeAndLeaf**'s main function. It will read your **igraph** object,
-generate the tree layout, plot it in **RedeR** interface and use functions
-to enhance appeal and distribution. 
-
-```{r, eval = FALSE}
-treeAndLeaf(obj = rdp, gg = gg)
-
+#--- Call 'relax' to fine-tune the leaf nodes
+relax(rdp, p1=25, p2=200, p3=5, p5=5, ps=TRUE)
 ```
 
-Adding legends is optional. When you call for `att.setv()` and inform column
-names for `nodeColor` and `nodeSize`, it will automatically generate a **RedeR** 
-readable legend, which can be plotted using the code below.
+At this point, the user can interact with the layout process to achieve the 
+best or desired layout; we suggest fine-tuning the force-directed algorithm 
+parameters, either through the R/Java interface or the command line relaxation 
+function. Note that the unroot tree diagram represents the initial state; then 
+a relaxing process should start until the finest graph layout is achieved. 
+The final layout varies depending on the initial state, which can also be 
+adjusted by providing more or less room for the spatial configuration 
+(*e.g.* via `zoom` parameter).
 
-```{r, eval = FALSE}
-addLegend.color(obj = rdp, gg, title = "Murder Rate", 
-                position = "right")
-addLegend.size(obj = rdp, gg, title = "Urban Population Size",
+```{r, eval=FALSE}
+#--- Add legends
+addLegend.color(obj = rdp, tal, title = "Murder Rate", 
+                position = "topright")
+addLegend.size(obj = rdp, tal, title = "Urban Population Size",
                position = "bottomright")
 ```
 
-## Making manual adjustments
-
-At this stage the image produced needs small adjustments to solve the
-residual edge crossings. It is possible to just click and drag a node
-to adjust it while the relaxation algorithm is still running.
-
 <p align="center">
-<img height="500" src="USAReds.png">
+<img height="300" src="USAReds.png">
 </p>
 
-All the different parameters can be changed and personalized throughout the
-steps to achieve the desired image.
+# Setting the initial *tree-and-leaf* state with *ggtree* layouts
 
-# Case Study 1: a large dendrogram
+The tree diagram represents the initial state of a *tree-and-leaf*, which is then 
+relaxed by a force-directed algorithm applied to the terminal nodes. Therefore,
+the final *tree-and-leaf* layout varies depending on the initial state. The
+**treeAndLeaf** package also accepts `ggtree` layouts to setup the initial state. 
+For example, next we show a tree diagram generated by the **ggtree** package,
+and then we apply the *tree-and-leaf* transformation.
+
+## Package and data requirements
+
+```{r, eval=TRUE, message=FALSE}
+#-- Libraries required in this section:
+#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+# BiocManager::install(c("TreeAndLeaf","RedeR","ggtree))
+# install.packages(c("igraph","ape", "dendextend", "dplyr", 
+#                    "ggplot2", "RColorBrewer"))
+
+#-- Load packages
+library("TreeAndLeaf")
+library("RedeR")
+library("igraph")
+library("ggtree")
+library("ape")
+library("dendextend")
+library("dplyr")
+library("ggplot2")
+library("RColorBrewer")
+```
+
+## Building and plotting a *phylo* tree with *ggtree* layouts
+
+```{r, eval=FALSE}
+#--- Generate a random phylo tree
+phylo_tree <- rcoal(300)
+
+#--- Set groups and node sizes
+group <- size <- dendextend::cutree(phylo_tree, 10)
+group[] <- LETTERS[1:10][group]
+size[] <- sample(size)
+group.df <- data.frame(label=names(group), group=group, size=size)
+phylo_tree <- dplyr::full_join(phylo_tree, group.df, by='label')
+
+#--- Plot the phylo tree using a 'ggtree' layout
+pal <- brewer.pal(10, "Set3")
+ggt <- ggtree(phylo_tree, layout = 'daylight', branch.length='none')
+ggt + geom_tippoint(aes(color=group, size=size)) +
+  scale_color_manual(values=pal) + scale_y_reverse()
+```
+
+## Applying *tree-and-leaf* transformation to *ggtree* layouts
+
+```{r, eval=FALSE}
+#--- Get the tree-and-leaf
+tal <- treeAndLeaf(ggt)
+
+#--- Map attributes to the tree-and-leaf
+#Note: 'refcol = 1' indicates that 'dat' col 1 will be used as mapping IDs
+tal <- att.mapv(g = tal, dat = group.df, refcol = 1)
+
+#--- Set graph attributes using the 'att.setv' wrapper function
+tal <- att.setv(g = tal, from = "group", to = "nodeColor",
+                cols = pal)
+tal <- att.setv(g = tal, from = "size", to = "nodeSize",
+                xlim = c(10, 50, 5))
+
+#--- Set graph attributes using 'att.addv' and 'att.adde' functions
+tal <- att.addv(tal, "nodeFontSize", value = 1)
+tal <- att.addv(tal, "nodeLineWidth", value = 0)
+tal <- att.addv(tal, "nodeColor", value = "black", index=!V(tal)$isLeaf)
+tal <- att.adde(tal, "edgeWidth", value = 3)
+tal <- att.adde(tal, "edgeColor", value = "black")
+```
+
+```{r, eval=FALSE}
+#--- Call RedeR application
+rdp <- RedPort()
+calld(rdp)
+resetd(rdp)
+```
+
+```{r, eval=FALSE}
+#--- Send the tree-and-leaf to the interactive R/Java interface
+addGraph(obj = rdp, g = tal, zoom=50)
+
+#--- Select inner nodes, preventing them from relaxing
+selectNodes(rdp, V(tal)$name[!V(tal)$isLeaf], anchor = TRUE)
+
+#--- Call 'relax' to fine-tune the leaf nodes
+relax(rdp, p1=25, p2=100, p3=5, p5=1, p8=5, ps=TRUE)
+
+#--- Add legends
+addLegend.color(obj = rdp, tal, title = "Group", 
+                position = "topright",vertical=T)
+addLegend.size(obj = rdp, tal, title = "Size", 
+               position = "topleft", 
+               vertical=T, dxtitle=10)
+```
+
+<p align="center">
+<img height="350" src="ggtree_tal.png">
+</p>
+
+# Case Study 1: visualizing a large dendrogram
 
 ## Context
 
-The **TreeAndLeaf** package is particularly useful when dealing with large
-dendrograms. This section uses the `quakes` built-in dataframe as an
-example. To know more about this data, check `?quakes`. Since each step was
-detailed in the first example, this one will focus on describing only features
-we were not able to see with `USArrests`.
+This section follows the same steps described in the *Quick Start*, but 
+using a larger dendrogram derived from the R built-in `quakes` dataset. 
+The `quakes` is a dataframe available in the user's workspace. To know more 
+about this dataframe, please query `?quakes` in the R console. 
+We will build a dendrogram from the `quakes` dataset, then transform the 
+dendrogram into a *tree-and-leaf* diagram, and the result will be visualized 
+in the **RedeR** application.
 
 ## Package and data requirements
-```{r}
+
+```{r, eval=TRUE, message=FALSE}
+#-- Libraries required in this section:
+#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+# BiocManager::install(c("TreeAndLeaf","RedeR"))
+# install.packages(c("igraph", "RColorBrewer"))
+
+#-- Load packages
 library(TreeAndLeaf)
 library(RedeR)
+library(igraph)
 library(RColorBrewer)
 ```
 
 ```{r echo=TRUE}
+#-- Check data
 dim(quakes)
 head(quakes)
 ```
 
-## Building the dendrogram
-
-Clearly, when it comes to big dendrograms, it gets harder to show
-clusterization and any other information by conventional plotting.
-This is where **TreeAndLeaf** really makes a difference.
-
-```{r echo=TRUE}
-hc <- hclust(dist(quakes))
-plot(hc)
+```{r, eval=TRUE, message=FALSE}
+#-- Building a large dendrogram
+hc <- hclust(dist(quakes), "ave")
+plot(hc, main="Dendrogram for the 'quakes' dataset",
+     xlab="", sub="")
 ```
 
-## Converting and formatting the igraph object
+## Building and plotting a large *tree-and-leaf* diagram
 
-As described before, the package function `hclust2igraph()` is used for
-converting and function `formatTree()` is used for initial attribute 
-setting. From **RedeR**, `att.mapv()` is used for inserting the dataframe
-inside the **igraph** object and `att.setv()` to change graph characteristics.
-Package **RColorBrewer** is used in the variable `pal`, to generate a color palette.
+```{r, eval=FALSE}
+#--- Get the tree-and-leaf
+tal <- treeAndLeaf(hc)
+```
 
-```{r}
-# Converting hclust to igraph format
-gg <- hclust2igraph(hc)
+```{r, eval=FALSE}
+#--- Map attributes to the tree-and-leaf
+#Note: 'refcol = 0' indicates that 'dat' rownames will be used as mapping IDs
+tal <- att.mapv(tal, quakes, refcol = 0)
 
-# Formatting the tree
-gg <- formatTree(gg, theme = 1, cleanalias = TRUE)
-
-# Mapping the data into the igraph object
-gg <- att.mapv(gg, quakes, refcol = 0)
-
-# Set attributes
+#--- Set graph attributes using the 'att.setv' wrapper function
 pal <- brewer.pal(9, "Greens")
-gg <- att.setv(gg, from = "mag", to = "nodeColor",
-               cols = pal, nquant = 10)
-gg <- att.setv(gg, from = "depth", to = "nodeSize",
-               xlim = c(240, 880, 1), nquant = 5)
+tal <- att.setv(g = tal, from = "mag", to = "nodeColor",
+                cols = pal, nquant = 10)
+tal <- att.setv(g = tal, from = "depth", to = "nodeSize",
+                xlim = c(40, 120, 20), nquant = 5)
 
+#--- Set graph attributes using 'att.addv' and 'att.adde' functions
+tal <- att.addv(tal, "nodeFontSize", value = 1)
+tal <- att.adde(tal, "edgeWidth", value = 10)
 ```
 
-As stated above, **RedeR** uses a relaxation force-based algorithm to achieve a
-stable distribution of nodes. One of the parameters used to calculate
-attraction and repulsion forces is `nodeSize`. On the first example, the node
-sizes ranged from 50 to 150 and on this one, it ranged from 240 to 880. The
-`treeAndLeaf()` function uses less zoom to plot if the dendrogram has a great
-number of nodes, so it is necessary to use bigger sizes for bigger trees. 
+The next steps will call the **RedeR** application, and then display the 
+*tree-and-leaf* diagram in an interactive R/Java interface. The initial layout
+will show an unrooted tree diagram, which will be subsequently relaxed by a 
+force-directed algorithm applied to the terminal nodes of the tree.
 
-
-Therefore, the `nodeSize` is a vital attribute for the tree-and-leaf structure
-formation. If sizes are too small, the nodes will barely move during the
-relaxation process. If sizes are too big, overlaps will be difficult to solve
-and unwanted behaviors can arise. If the sizes are too different (i.e. 10 and
-1000), you probably won’t be able to see the smaller ones. That being said, if
-the tree is not clear, try changing parameters such as `nodeSize` to achieve the
-desired image.
-
-## Calling RedeR interface and plotting
-
-Repeat the step described in section *Quick Start*.
-
-```{r, eval = FALSE}
+```{r, eval=FALSE}
+#--- Call RedeR application
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
 ```
 
-```{r, eval = FALSE}
-# Plotting the tree
-treeAndLeaf(rdp, gg)
+```{r, eval=FALSE}
+#--- Send the tree-and-leaf to the interactive R/Java interface
+addGraph(obj = rdp, g = tal, zoom=10)
 
-# Adding legend
-addLegend.color(obj = rdp, gg, title = "Richter Magnitude")
-addLegend.size(obj = rdp, gg, title = "Depth (km)")
+#--- Call 'relax' to fine-tune the leaf nodes
+relax(rdp, p1=25, p2=200, p3=10, p4=100, p5=10, ps=TRUE)
 ```
 
-## Making manual adjustments
-
-After manually solving some overlaps, you should be able to achieve the result
-shown below. On launching **RedeR**, the window *Dynamic layout settings* comes up, 
-and here the parameter *repulse radius* is fixed to achieve the graph as shown below.
+```{r, eval=FALSE}
+#--- Add legends
+addLegend.color(obj = rdp, tal, title = "Richter Magnitude",
+                position = "bottomright")
+addLegend.size(obj = rdp, tal, title = "Depth (km)")
+```
 
 <p align="center">
-<img height="500" src="QuakesTree.png">
+<img height="400" src="QuakesTree.png">
 </p>
 
-# Case Study 2: a phylogenetic tree
+# Case Study 2: visualizing a phylogenetic tree
 
 ## Context
 
-The **TreeAndLeaf** package is also able to work with phylogenetic trees.
-To show how it works, we will apply these steps to plot a tree from
-**geneplast** package. It is a tree with 121 tips listing the eukaryotes
-in STRING-db, release 9.1.
+This section generates a *tree-and-leaf* diagram from a pre-computed `phylo` 
+tree object. We will use a phylogenetic tree listing 121 eukaryotes, available 
+from the **geneplast** package.
 
 ## Package and data requirements
 
-```{r}
+```{r, eval=TRUE, message=FALSE}
+#-- Libraries required in this section:
+#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+# BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
+# install.packages(c("igraph","ape", "RColorBrewer"))
+
+#-- Load packages
 library(TreeAndLeaf)
 library(RedeR)
-library(RColorBrewer)
-library(ape) # Analyses of Phylogenetics and Evolution
 library(igraph)
+library(ape)
+library(geneplast)
+library(RColorBrewer)
 ```
 
-As mentioned, the tree can be loaded from **geneplast** package by running
-the code below.
-
-```{r}
-library(geneplast)
+```{r, eval=TRUE, message=FALSE}
+#-- Load data and plot the phylogenetic tree
+data("spdata")
 data("gpdata.gs")
 plot(phyloTree)
 ```
 
-Aside from exhibiting the phylogenetic tree as a tree-and-leaf diagram, extra
-layers of data to each species can also be added. **TreeAndLeaf** package offers
-a dataframe containing statistical data of eukaryotes complete genomes, downloaded
-from NCBI Genomes database. For more information, type `?spdata`.
+## Building and plotting a *tree-and-leaf* from a phylogenetic tree
 
-```{r}
-data("spdata")
-```
-
-## Matching data from both sources
-
-The `spdata` object only shows data for eukaryotes with complete genomes
-available, an inner join has to be made to select only the species
-available in both datasets used. Therefore, it is necessary to check
-which tips of the `phylo` object has a match with a row in `spdata`. Then,
-the tree is plotted again only with the selected tips.
-
-```{r}
-# Accessory indexing 
-idx <- match(as.numeric(spdata$tax_id), as.numeric(phyloTree$tip.label))
-idx <- idx[!is.na(idx)]
-tokeep <- phyloTree$tip.label[idx]
+```{r, eval=FALSE}
+#--- Drop organisms not listed in the 'spdata' annotation
 phyloTree$tip.label <- as.character(phyloTree$tip.label)
-
-# Remaking the tree
-pruned.tree <- drop.tip(phyloTree, phyloTree$tip.label[-match(tokeep,
-                                                              phyloTree$tip.label)])
+tokeep <- phyloTree$tip.label %in% spdata$tax_id
+pruned.phylo <- drop.tip(phyloTree, phyloTree$tip.label[!tokeep])
 ```
 
+```{r, eval=FALSE}
+#--- Get the tree-and-leaf
+tal <- treeAndLeaf(pruned.phylo)
 
-## Converting and formatting the igraph object
+#--- Map attributes to the tree-and-leaf
+#Note: 'refcol = 1' indicates that 'dat' col 1 will be used as mapping IDs
+tal <- att.mapv(g = tal, dat = spdata, refcol = 1)
 
-For converting a phylogenetic tree to an **igraph** object, the package provides
-another function: `phylo2igraph()`.
-
-```{r}
-# Converting phylo to igraph
-tal.phylo <- phylo2igraph(pruned.tree)
-
-# Formatting the tree
-tal.phylo <- formatTree(tal.phylo, theme = 4)
-
-# Mapping data to the igraph object
-tal.phylo <- att.mapv(g = tal.phylo, dat = spdata, refcol = 1)
-
-# Setting attributes
+#--- Set graph attributes using the 'att.setv' wrapper function
 pal <- brewer.pal(9, "Purples")
-tal.phylo <- att.setv(g = tal.phylo, from = "genome_size_Mb",
-                      to = "nodeSize", xlim = c(120, 250, 1), nquant = 5)
-tal.phylo <- att.setv (g = tal.phylo, from = "proteins",
-                       to = "nodeColor", nquant = 5,
-                       cols = pal, na.col = "black")
+tal <- att.setv(g = tal, from = "genome_size_Mb",
+                to = "nodeSize", xlim = c(120, 250, 1), nquant = 5)
+tal <- att.setv (g = tal, from = "proteins",
+                 to = "nodeColor", nquant = 5,
+                 cols = pal, na.col = "black")
 ```
 
-## Selecting names to be shown when plotting
+```{r, eval=FALSE}
+#--- Add graph attributes using 'att.adde' and 'att.addv' functions
+tal <- att.addv(tal, "nodeFontSize", value = 10)
+tal <- att.adde(tal, "edgeWidth", value = 20)
 
-If `treeAndLeaf()` is called now the NCBI TaxIDs will be shown above each node,
-which is not desired. So the **igraph** object needs to be modified to show
-species names, but not all of them, to prevent unreadability. For that, general
-**igraph** manipulation functions can be used.
+# Set species names to 'nodeAlias' attribute
+tal <- att.setv(tal, from = "sp_name", to = "nodeAlias")
 
-```{r}
-# Changing the alias to show the names and making them invisible
-idx <- match(V(tal.phylo)$nodeAlias, spdata$tax_id)
-V(tal.phylo)$nodeAlias <- spdata$sp_name[idx]
-V(tal.phylo)$nodeAlias[is.na(V(tal.phylo)$nodeAlias)] <- ""
-V(tal.phylo)$nodeFontSize <- 1
-
-# Randomly selecting some names to be shown
-set.seed(9)
-V(tal.phylo)$nodeFontSize[sample(1:length(V(tal.phylo)$nodeFontSize), 50)] <- 100
-V(tal.phylo)$nodeFontSize[V(tal.phylo)$name == "9606"] <- 100 #Homo sapiens
+# Select a few names to highlight in the graph
+tal <- att.addv(tal, "nodeFontSize", value = 100, 
+       filter=list('name'=sample(pruned.phylo$tip.label,30)))
+tal <- att.addv(tal, "nodeFontSize", value = 100, 
+                filter=list('name'="9606")) #Homo sapiens
 ```
 
-## Plotting and making manual adjustments
-
-```{r eval = FALSE}
-# Calling RedeR
+```{r, eval=FALSE}
+# Call RedeR
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
 
-# Plotting
-treeAndLeaf(obj = rdp, gg = tal.phylo)
+#--- Send the tree-and-leaf to the interactive R/Java interface
+addGraph(obj = rdp, g = tal, zoom=10)
 
-# Adding Legend
-addLegend.size(rdp, tal.phylo, title = "Genome Size (Mb)")
-addLegend.color(rdp, tal.phylo, title = "Protein Count")
+#--- Call 'relax' to fine-tune the leaf nodes
+relax(rdp, p1=50, p8=15, ps=TRUE)
+```
+
+```{r, eval=FALSE}
+#--- Add legends
+addLegend.color(rdp, tal, title = "Proteome Size (n)")
+addLegend.size(rdp, tal, title = "Genome Size (Mb)")
 ```
 
 <p align="center">
-<img height="500" src="PhyloPurple.png">
+<img height="400" src="PhyloPurple.png">
 </p>
 
-# Case Study 3: a nonbinary tree
+# Case Study 3: visualizing a non-binary tree
 
 ## Context
 
-Although **TreeAndLeaf** was written to work with binary trees, the package
-also works for some non binary diagrams such as the STRING-db species tree,
-release 11.0.
+The **TreeAndLeaf** package is designed to layout binary trees, but it can also
+layout other graph configurations. To exemplify this case, we will use a 
+larger phylogenetic tree available from the **geneplast** package, and for 
+which some inner nodes have more than two children, or non-binary nodes.
 
-## Configurations and plotting
+## Package and data requirements
 
-Since all features were detailed on previous sections, this
-is just a demonstration and there will be no code explanation other than
-comments. This example uses the same dataframe `spdata` downloaded from NCBI Genomes,
-applied on the previous example.
+```{r, eval=FALSE}
+#-- Libraries required in this section:
+#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+# BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
+# install.packages(c("igraph","ape", "RColorBrewer"))
 
-```{r}
-# Packages required
+#-- Load packages
 library(TreeAndLeaf)
 library(RedeR)
-library(RColorBrewer)
-library(ape)
 library(igraph)
+library(ape)
 library(geneplast)
+library(RColorBrewer)
 ```
 
-```{r}
-# Loading data
-data("spdata") # NCBI Genomes scraped info
-data("phylo_species") # STRING-db tree metadata
-data("phylo_tree") # STRING-db phylo object
-
-# Remaking the tree with species inside spdata
-idx <- match(as.numeric(spdata$tax_id), as.numeric(phylo_species$X...taxon_id))
-idx <- idx[!is.na(idx)]
-tokeep <- phylo_species$X...taxon_id[idx]
-pruned.tree <- drop.tip(phylo_tree,phylo_tree$tip.label[-match(tokeep, phylo_tree$tip.label)])
-
-# Converting phylo to igraph
-tal.phy <- phylo2igraph(pruned.tree)
-
-# Formatting the tree
-tal.phy <- formatTree(gg = tal.phy, theme = 3)
-
-# Mapping data into the igraph object
-tal.phy <- att.mapv(g = tal.phy, dat = spdata, refcol = 1)
-
-# Setting attributes
-pal <- brewer.pal(9, "Blues")
-tal.phy <- att.setv(g = tal.phy, from = "genome_size_Mb",
-                    to = "nodeSize", nquant = 5, xlim = c(200, 600, 1))
-tal.phy <- att.setv(g = tal.phy, from = "proteins", to = "nodeColor",
-                    nquant = 5, cols = pal, na.col = "black")
-
-# Randomly selecting names to be shown
-set.seed(9)
-V(tal.phy)$nodeFontSize <- 1
-V(tal.phy)$nodeFontSize[sample(1:length(V(tal.phy)$nodeFontSize), 80)] <- 300
-V(tal.phy)$nodeFontSize[V(tal.phy)$name == 9606] <- 300
-
-idx <- match(V(tal.phy)$nodeAlias, spdata$tax_id)
-V(tal.phy)$nodeAlias <- spdata$sp_name[idx]
-V(tal.phy)$nodeAlias[is.na(V(tal.phy)$nodeAlias)] <- ""
+```{r, eval=TRUE, message=FALSE}
+#-- Load data 
+data("spdata")
+data("phylo_tree")
 ```
 
-```{r eval = FALSE}
-# Calling RedeR and plotting
+```{r, eval=TRUE, message=FALSE}
+#--- Drop organisms not listed in the 'spdata' annotation
+tokeep <- phylo_tree$tip.label %in% spdata$tax_id
+pruned.phylo <- drop.tip(phylo_tree, phylo_tree$tip.label[!tokeep])
+```
+
+## Building and plotting a *tree-and-leaf* for a non-binary tree
+
+```{r, eval=FALSE}
+#--- Get the tree-and-leaf
+tal <- treeAndLeaf(pruned.phylo)
+```
+
+```{r, eval=FALSE}
+#--- Map attributes to the tree-and-leaf using "%>%" operator
+tal <- tal %>%
+  att.mapv(dat = spdata, refcol = 1) %>%
+  att.setv(from = "genome_size_Mb", to = "nodeSize",
+           xlim = c(120, 250, 1), nquant = 5) %>%
+  att.setv(from = "proteins", to = "nodeColor", nquant = 5,
+           cols = brewer.pal(9, "Blues"), na.col = "black") %>%
+  att.setv(from = "sp_name", to = "nodeAlias") %>%
+  att.adde(to = "edgeWidth", value = 20) %>%
+  att.addv(to = "nodeFontSize", value = 10) %>%
+  att.addv(to = "nodeFontSize", value = 100,
+      filter = list("name" = sample(pruned.phylo$tip.label, 30))) %>%
+  att.addv(to = "nodeFontSize", value = 100, 
+           filter = list("name" = "9606"))
+```
+
+```{r, eval=FALSE}
+# Call RedeR
 rdp <- RedPort()
 calld(rdp)
 resetd(rdp)
 
-# Plotting the tree
-treeAndLeaf(rdp, tal.phy)
+#--- Send the tree-and-leaf to the interactive R/Java interface
+addGraph(obj = rdp, g = tal, zoom=5)
 
-# Adding legends
-addLegend.color(rdp, tal.phy, title = "Protein count")
-addLegend.size(rdp, tal.phy, title = "Genome size (Mb)")
+#--- Call 'relax' to fine-tune the leaf nodes
+relax(rdp, p1=50, p8=15, ps=TRUE)
+```
+
+```{r, eval=FALSE}
+#--- Add legends
+addLegend.color(rdp, tal, title = "Proteome Size (n)")
+addLegend.size(rdp, tal, title = "Genome size (Mb)")
 ```
 
 <p align="center">
 <img width="700" src="nBinPhylo.png">
 </p>
 
-
-# Installation
-
-The package is freely available from the Bioconductor at
-https://bioconductor.org/packages/TreeAndLeaf.
 
 # Session information
 

@@ -1,10 +1,8 @@
-#' Genome statistical data from eukaryotes with complete genome
+#' Genome statistics for eukaryotes with complete genome sequence
 #'
-#' Data from NCBI Genome database showing statistical results for
-#' eukaryotes with complete genome sequenced.
-#' The list of organisms with complete genome is available on KEGG 
-#' Organisms website and NCBI data was scraped using RCrawler package.
-#' Taxonomy ids were obtained using NCBI Tax Identifier.
+#' Data from the NCBI Genome Database for eukaryotes with complete genome sequence.
+#' The list of organisms were obtained from the KEGG Organisms Database, and
+#' taxonomy IDs were obtained from the NCBI Taxonomy Database.
 #' 
 #' @docType data
 #'
@@ -17,19 +15,18 @@
 #' @keywords datasets
 #'
 #' @references
-#' Genome - NCBI.
-#' Retrieved August 15, 2019 from
+#' NCBI Genome Database
 #' https://www.ncbi.nlm.nih.gov/genome
+#' Accessed: August 15, 2019.
 #' 
-#' Taxonomy - NCBI. Tax Identifier.
-#' Retrieved August 15, 2019 from
+#' NCBI Taxonomy Database
 #' https://www.ncbi.nlm.nih.gov/taxonomy
+#' Accessed: August 15, 2019.
 #' 
-#' KEGG Organisms: Complete Genomes.
-#' Retrieved August 15, 2019 from
+#' KEGG Organisms Database
 #' https://www.genome.jp/kegg/catalog/org_list.html
+#' Accessed: August 15, 2019.
 #'
 #' @examples
 #' data(spdata)
-#' View(spdata)
 NULL

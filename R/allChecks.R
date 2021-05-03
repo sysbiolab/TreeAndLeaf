@@ -1,35 +1,28 @@
 ##This function is used for argument checking
 tal.checks <- function(name, para){
-    if(identical(name, "gg")) {
-        if(!igraph::is.igraph(para)){
-            stop("'gg' must be an igraph!", call.=FALSE)
-        } else if (is.null(para$intnodes)){
-            stop("'gg' must be created by phylo2igraph() 
-                    or hclust2igraph()!", call.=FALSE)
+    if(identical(name, "tal")) {
+        if(!is.tal(para)){
+            stop("'tal' must be an 'igraph' object created by the 
+                 TreeAndLeaf() function!", call.=FALSE)
         }
     } else if(identical(name, "theme")){
         if(!is.singleInteger(para) || para > 5 || para < 1){
             stop("'theme' must be an integer ranging from 1 to 5!", 
                     call.=FALSE)
         }
-    } else if(identical(name, "cleanalias")){
-        if(!is.singleLogical(para)){
-            stop("'cleanalias' must be a logical value!", call.=FALSE)
-        }
     } else if(identical(name, "obj")){
-        if(!is(para, "RedPort")){
-            stop("'obj' must be a RedPort object created by 
-                    RedeR::RedPort()!", call.=FALSE)
-        }
-    } else if(identical(name, "phy")){
-        if(!is(para, "phylo")){
-            stop("'phy' must be a 'phylo' object!", call.=FALSE)
-        }
+        if (!any(class(para)%in%c("hclust","phylo","ggtree")))
+            stop("'obj' must be a 'hclust', 'phylo', or 'ggtree' objects!", 
+                 call.=FALSE)
+    } else {
+        stop("'name' option not available!", call.=FALSE)
     }
 }
 
-
 ##------------------------------------------------------------------------------
+is.tal <- function(para){
+    "tal" %in% class(para)
+}
 is.singleInteger <- function(para){
     lg <- (is.integer(para) || is.numeric(para)) && length(para)==1L && 
         !is.na(para)

@@ -1,8 +1,6 @@
-#' Species tree from STRING-db v11.0
+#' Species tree from STRING-db v11
 #'
-#' Species tree from STRING-db website.
-#' Available visiting download page under Accessory Data.
-#' Version: 11.0
+#' A phylo object for the species tree available from the STRING-db v11.
 #' 
 #' @docType data
 #' 
@@ -15,9 +13,9 @@
 #' @keywords phylotree
 #'
 #' @references 
-#' STRING: functional protein association networks.
-#' Retrieved August 15, 2019, from
-#' https://string-db.org/
+#' Szklarczyk D. et al. STRING v11: protein-protein association networks with 
+#' increased coverage, supporting functional discovery in genome-wide 
+#' experimental datasets. Nucleic Acids Res. 47:D607-613, 2019.
 
 #' 
 NULL
