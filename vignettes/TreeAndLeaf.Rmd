@@ -156,7 +156,7 @@ resetd(rdp)
 
 ```{r, eval=FALSE}
 #--- Send the tree-and-leaf to the interactive R/Java interface
-addGraph(obj = rdp, g = tal, zoom=75)
+addGraph(obj = rdp, g = tal, gzoom=75)
 
 #--- Call 'relax' to fine-tune the leaf nodes
 relax(rdp, p1=25, p2=200, p3=5, p5=5, ps=TRUE)
@@ -169,7 +169,7 @@ function. Note that the unroot tree diagram represents the initial state; then
 a relaxing process should start until the finest graph layout is achieved. 
 The final layout varies depending on the initial state, which can also be 
 adjusted by providing more or less room for the spatial configuration 
-(*e.g.* via `zoom` parameter).
+(*e.g.* via `gzoom` parameter).
 
 ```{r, eval=FALSE}
 #--- Add legends
@@ -194,7 +194,7 @@ and then we apply the *tree-and-leaf* transformation.
 
 ## Package and data requirements
 
-```{r, eval=TRUE, message=FALSE}
+```{r, eval=FALSE, message=FALSE}
 #-- Libraries required in this section:
 #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR","ggtree))
@@ -205,8 +205,8 @@ and then we apply the *tree-and-leaf* transformation.
 library("TreeAndLeaf")
 library("RedeR")
 library("igraph")
-library("ggtree")
 library("ape")
+library("ggtree")
 library("dendextend")
 library("dplyr")
 library("ggplot2")
@@ -266,7 +266,7 @@ resetd(rdp)
 
 ```{r, eval=FALSE}
 #--- Send the tree-and-leaf to the interactive R/Java interface
-addGraph(obj = rdp, g = tal, zoom=50)
+addGraph(obj = rdp, g = tal, gzoom=50)
 
 #--- Select inner nodes, preventing them from relaxing
 selectNodes(rdp, V(tal)$name[!V(tal)$isLeaf], anchor = TRUE)
@@ -300,7 +300,7 @@ in the **RedeR** application.
 
 ## Package and data requirements
 
-```{r, eval=TRUE, message=FALSE}
+```{r, eval=FALSE, message=FALSE}
 #-- Libraries required in this section:
 #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR"))
@@ -364,7 +364,7 @@ resetd(rdp)
 
 ```{r, eval=FALSE}
 #--- Send the tree-and-leaf to the interactive R/Java interface
-addGraph(obj = rdp, g = tal, zoom=10)
+addGraph(obj = rdp, g = tal, gzoom=10)
 
 #--- Call 'relax' to fine-tune the leaf nodes
 relax(rdp, p1=25, p2=200, p3=10, p4=100, p5=10, ps=TRUE)
@@ -391,7 +391,7 @@ from the **geneplast** package.
 
 ## Package and data requirements
 
-```{r, eval=TRUE, message=FALSE}
+```{r, eval=FALSE, message=FALSE}
 #-- Libraries required in this section:
 #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
@@ -406,7 +406,7 @@ library(geneplast)
 library(RColorBrewer)
 ```
 
-```{r, eval=TRUE, message=FALSE}
+```{r, eval=FALSE, message=FALSE}
 #-- Load data and plot the phylogenetic tree
 data("spdata")
 data("gpdata.gs")
@@ -461,7 +461,7 @@ calld(rdp)
 resetd(rdp)
 
 #--- Send the tree-and-leaf to the interactive R/Java interface
-addGraph(obj = rdp, g = tal, zoom=10)
+addGraph(obj = rdp, g = tal, gzoom=10)
 
 #--- Call 'relax' to fine-tune the leaf nodes
 relax(rdp, p1=50, p8=15, ps=TRUE)
@@ -503,13 +503,13 @@ library(geneplast)
 library(RColorBrewer)
 ```
 
-```{r, eval=TRUE, message=FALSE}
+```{r, eval=FALSE, message=FALSE}
 #-- Load data 
 data("spdata")
 data("phylo_tree")
 ```
 
-```{r, eval=TRUE, message=FALSE}
+```{r, eval=FALSE, message=FALSE}
 #--- Drop organisms not listed in the 'spdata' annotation
 tokeep <- phylo_tree$tip.label %in% spdata$tax_id
 pruned.phylo <- drop.tip(phylo_tree, phylo_tree$tip.label[!tokeep])
@@ -546,7 +546,7 @@ calld(rdp)
 resetd(rdp)
 
 #--- Send the tree-and-leaf to the interactive R/Java interface
-addGraph(obj = rdp, g = tal, zoom=5)
+addGraph(obj = rdp, g = tal, gzoom=5)
 
 #--- Call 'relax' to fine-tune the leaf nodes
 relax(rdp, p1=50, p8=15, ps=TRUE)
@@ -561,7 +561,6 @@ addLegend.size(rdp, tal, title = "Genome size (Mb)")
 <p align="center">
 <img width="700" src="nBinPhylo.png">
 </p>
-
 
 # Session information
 

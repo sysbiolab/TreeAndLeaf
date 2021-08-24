@@ -68,7 +68,7 @@ treeAndLeaf <- function(obj){
     #--- set edge weights
     E(gg)$weight <- 0
     bt <- igraph::edge_betweenness(gg, directed = T)
-    bt <- (1-bt/max(bt))*100
+    bt <- (1 - bt/max(bt))*100
     E(gg)$weight <- bt
     #--- set node and font sizes
     V(gg)$nodeAlias <- V(gg)$name
@@ -84,7 +84,7 @@ treeAndLeaf <- function(obj){
     #--- set zoom
     sz <- sum(V(gg)$isLeaf)
     sz <- sqrt(sz)
-    gg$zoom <- ceiling(max(0,100-sz))
+    # gg$zoom <- ceiling(max(0,100-sz))
     gg$gtype <- "TreeAndLeaf"
     class(gg) <- c("tal","igraph")
     return(gg)
