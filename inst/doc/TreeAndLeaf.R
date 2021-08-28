@@ -6,7 +6,7 @@ knitr::opts_chunk$set(
 
 ## ---- eval=TRUE, message=FALSE------------------------------------------------
 #-- Libraries required in this section:
-#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR"))
 # install.packages(c("igraph","RColorBrewer"))
 
@@ -27,7 +27,7 @@ plot(hc, main="Dendrogram for the 'USArrests' dataset",
      xlab="", sub="")
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  #--- Get the tree-and-leaf
+#  #-- Convert the 'hclust' object into a 'tree-and-leaf' object
 #  tal <- treeAndLeaf(hc)
 
 ## ---- eval=FALSE--------------------------------------------------------------
@@ -69,7 +69,7 @@ plot(hc, main="Dendrogram for the 'USArrests' dataset",
 
 ## ---- eval=FALSE, message=FALSE-----------------------------------------------
 #  #-- Libraries required in this section:
-#  #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#  #-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 #  # BiocManager::install(c("TreeAndLeaf","RedeR","ggtree))
 #  # install.packages(c("igraph","ape", "dendextend", "dplyr",
 #  #                    "ggplot2", "RColorBrewer"))
@@ -96,14 +96,16 @@ plot(hc, main="Dendrogram for the 'USArrests' dataset",
 #  group.df <- data.frame(label=names(group), group=group, size=size)
 #  phylo_tree <- dplyr::full_join(phylo_tree, group.df, by='label')
 #  
-#  #--- Plot the phylo tree using a 'ggtree' layout
+#  #--- Generate a ggtree with 'daylight' layout
 #  pal <- brewer.pal(10, "Set3")
 #  ggt <- ggtree(phylo_tree, layout = 'daylight', branch.length='none')
+#  
+#  #--- Plot the ggtree
 #  ggt + geom_tippoint(aes(color=group, size=size)) +
 #    scale_color_manual(values=pal) + scale_y_reverse()
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  #--- Get the tree-and-leaf
+#  #-- Convert the 'ggtree' object into a 'tree-and-leaf' object
 #  tal <- treeAndLeaf(ggt)
 #  
 #  #--- Map attributes to the tree-and-leaf
@@ -134,7 +136,7 @@ plot(hc, main="Dendrogram for the 'USArrests' dataset",
 #  addGraph(obj = rdp, g = tal, gzoom=50)
 #  
 #  #--- Select inner nodes, preventing them from relaxing
-#  selectNodes(rdp, V(tal)$name[!V(tal)$isLeaf], anchor = TRUE)
+#  selectNodes(rdp, V(tal)$name[!V(tal)$isLeaf], anchor=TRUE)
 #  
 #  #--- Call 'relax' to fine-tune the leaf nodes
 #  relax(rdp, p1=25, p2=100, p3=5, p5=1, p8=5, ps=TRUE)
@@ -148,7 +150,7 @@ plot(hc, main="Dendrogram for the 'USArrests' dataset",
 
 ## ---- eval=FALSE, message=FALSE-----------------------------------------------
 #  #-- Libraries required in this section:
-#  #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#  #-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 #  # BiocManager::install(c("TreeAndLeaf","RedeR"))
 #  # install.packages(c("igraph", "RColorBrewer"))
 #  
@@ -170,7 +172,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
      xlab="", sub="")
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  #--- Get the tree-and-leaf
+#  #-- Convert the 'hclust' object into a 'tree-and-leaf' object
 #  tal <- treeAndLeaf(hc)
 
 ## ---- eval=FALSE--------------------------------------------------------------
@@ -208,25 +210,25 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 #                  position = "bottomright")
 #  addLegend.size(obj = rdp, tal, title = "Depth (km)")
 
-## ---- eval=FALSE, message=FALSE-----------------------------------------------
-#  #-- Libraries required in this section:
-#  #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
-#  # BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
-#  # install.packages(c("igraph","ape", "RColorBrewer"))
-#  
-#  #-- Load packages
-#  library(TreeAndLeaf)
-#  library(RedeR)
-#  library(igraph)
-#  library(ape)
-#  library(geneplast)
-#  library(RColorBrewer)
+## ---- eval=TRUE, message=FALSE------------------------------------------------
+#-- Libraries required in this section:
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
+# BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
+# install.packages(c("igraph","ape", "RColorBrewer"))
 
-## ---- eval=FALSE, message=FALSE-----------------------------------------------
-#  #-- Load data and plot the phylogenetic tree
-#  data("spdata")
-#  data("gpdata.gs")
-#  plot(phyloTree)
+#-- Load packages
+library(TreeAndLeaf)
+library(RedeR)
+library(igraph)
+library(ape)
+library(geneplast)
+library(RColorBrewer)
+
+## ---- eval=TRUE, message=FALSE------------------------------------------------
+#-- Load data and plot the phylogenetic tree
+data("spdata")
+data("gpdata.gs")
+plot(phyloTree)
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  #--- Drop organisms not listed in the 'spdata' annotation
@@ -235,7 +237,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 #  pruned.phylo <- drop.tip(phyloTree, phyloTree$tip.label[!tokeep])
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  #--- Get the tree-and-leaf
+#  #-- Convert the phylogenetic tree into a 'tree-and-leaf' object
 #  tal <- treeAndLeaf(pruned.phylo)
 #  
 #  #--- Map attributes to the tree-and-leaf
@@ -274,7 +276,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 #  addGraph(obj = rdp, g = tal, gzoom=10)
 #  
 #  #--- Call 'relax' to fine-tune the leaf nodes
-#  relax(rdp, p1=50, p8=15, ps=TRUE)
+#  relax(rdp, ps=TRUE)
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  #--- Add legends
@@ -283,7 +285,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  #-- Libraries required in this section:
-#  #-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#  #-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 #  # BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
 #  # install.packages(c("igraph","ape", "RColorBrewer"))
 #  
@@ -306,7 +308,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 #  pruned.phylo <- drop.tip(phylo_tree, phylo_tree$tip.label[!tokeep])
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  #--- Get the tree-and-leaf
+#  #-- Convert the phylogenetic tree into a 'tree-and-leaf' object
 #  tal <- treeAndLeaf(pruned.phylo)
 
 ## ---- eval=FALSE--------------------------------------------------------------
@@ -335,7 +337,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 #  addGraph(obj = rdp, g = tal, gzoom=5)
 #  
 #  #--- Call 'relax' to fine-tune the leaf nodes
-#  relax(rdp, p1=50, p8=15, ps=TRUE)
+#  relax(rdp, ps=TRUE)
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  #--- Add legends

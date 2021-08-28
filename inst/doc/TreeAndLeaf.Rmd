@@ -65,7 +65,7 @@ application.
 
 ```{r, eval=TRUE, message=FALSE}
 #-- Libraries required in this section:
-#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR"))
 # install.packages(c("igraph","RColorBrewer"))
 
@@ -101,7 +101,7 @@ The `treeAndLeaf` function will transform the *hclust* into an *igraph* object,
 including some basic graph attributes to display in the **RedeR** application.
 
 ```{r, eval=FALSE}
-#--- Get the tree-and-leaf
+#-- Convert the 'hclust' object into a 'tree-and-leaf' object
 tal <- treeAndLeaf(hc)
 ```
 
@@ -196,7 +196,7 @@ and then we apply the *tree-and-leaf* transformation.
 
 ```{r, eval=FALSE, message=FALSE}
 #-- Libraries required in this section:
-#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR","ggtree))
 # install.packages(c("igraph","ape", "dendextend", "dplyr", 
 #                    "ggplot2", "RColorBrewer"))
@@ -226,9 +226,11 @@ size[] <- sample(size)
 group.df <- data.frame(label=names(group), group=group, size=size)
 phylo_tree <- dplyr::full_join(phylo_tree, group.df, by='label')
 
-#--- Plot the phylo tree using a 'ggtree' layout
+#--- Generate a ggtree with 'daylight' layout
 pal <- brewer.pal(10, "Set3")
 ggt <- ggtree(phylo_tree, layout = 'daylight', branch.length='none')
+
+#--- Plot the ggtree
 ggt + geom_tippoint(aes(color=group, size=size)) +
   scale_color_manual(values=pal) + scale_y_reverse()
 ```
@@ -236,7 +238,7 @@ ggt + geom_tippoint(aes(color=group, size=size)) +
 ## Applying *tree-and-leaf* transformation to *ggtree* layouts
 
 ```{r, eval=FALSE}
-#--- Get the tree-and-leaf
+#-- Convert the 'ggtree' object into a 'tree-and-leaf' object
 tal <- treeAndLeaf(ggt)
 
 #--- Map attributes to the tree-and-leaf
@@ -269,7 +271,7 @@ resetd(rdp)
 addGraph(obj = rdp, g = tal, gzoom=50)
 
 #--- Select inner nodes, preventing them from relaxing
-selectNodes(rdp, V(tal)$name[!V(tal)$isLeaf], anchor = TRUE)
+selectNodes(rdp, V(tal)$name[!V(tal)$isLeaf], anchor=TRUE)
 
 #--- Call 'relax' to fine-tune the leaf nodes
 relax(rdp, p1=25, p2=100, p3=5, p5=1, p8=5, ps=TRUE)
@@ -302,7 +304,7 @@ in the **RedeR** application.
 
 ```{r, eval=FALSE, message=FALSE}
 #-- Libraries required in this section:
-#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR"))
 # install.packages(c("igraph", "RColorBrewer"))
 
@@ -329,7 +331,7 @@ plot(hc, main="Dendrogram for the 'quakes' dataset",
 ## Building and plotting a large *tree-and-leaf* diagram
 
 ```{r, eval=FALSE}
-#--- Get the tree-and-leaf
+#-- Convert the 'hclust' object into a 'tree-and-leaf' object
 tal <- treeAndLeaf(hc)
 ```
 
@@ -391,9 +393,9 @@ from the **geneplast** package.
 
 ## Package and data requirements
 
-```{r, eval=FALSE, message=FALSE}
+```{r, eval=TRUE, message=FALSE}
 #-- Libraries required in this section:
-#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
 # install.packages(c("igraph","ape", "RColorBrewer"))
 
@@ -406,7 +408,7 @@ library(geneplast)
 library(RColorBrewer)
 ```
 
-```{r, eval=FALSE, message=FALSE}
+```{r, eval=TRUE, message=FALSE}
 #-- Load data and plot the phylogenetic tree
 data("spdata")
 data("gpdata.gs")
@@ -423,7 +425,7 @@ pruned.phylo <- drop.tip(phyloTree, phyloTree$tip.label[!tokeep])
 ```
 
 ```{r, eval=FALSE}
-#--- Get the tree-and-leaf
+#-- Convert the phylogenetic tree into a 'tree-and-leaf' object
 tal <- treeAndLeaf(pruned.phylo)
 
 #--- Map attributes to the tree-and-leaf
@@ -464,7 +466,7 @@ resetd(rdp)
 addGraph(obj = rdp, g = tal, gzoom=10)
 
 #--- Call 'relax' to fine-tune the leaf nodes
-relax(rdp, p1=50, p8=15, ps=TRUE)
+relax(rdp, ps=TRUE)
 ```
 
 ```{r, eval=FALSE}
@@ -490,7 +492,7 @@ which some inner nodes have more than two children, or non-binary nodes.
 
 ```{r, eval=FALSE}
 #-- Libraries required in this section:
-#-- TreeAndLeaf(>=1.2.1), RedeR(>=1.38.1), Bioconductor >= 3.12 (R >= 4.0)
+#-- TreeAndLeaf(>=1.4.2), RedeR(>=1.40.4), Bioconductor >= 3.13 (R >= 4.0)
 # BiocManager::install(c("TreeAndLeaf","RedeR","geneplast))
 # install.packages(c("igraph","ape", "RColorBrewer"))
 
@@ -518,7 +520,7 @@ pruned.phylo <- drop.tip(phylo_tree, phylo_tree$tip.label[!tokeep])
 ## Building and plotting a *tree-and-leaf* for a non-binary tree
 
 ```{r, eval=FALSE}
-#--- Get the tree-and-leaf
+#-- Convert the phylogenetic tree into a 'tree-and-leaf' object
 tal <- treeAndLeaf(pruned.phylo)
 ```
 
@@ -549,7 +551,7 @@ resetd(rdp)
 addGraph(obj = rdp, g = tal, gzoom=5)
 
 #--- Call 'relax' to fine-tune the leaf nodes
-relax(rdp, p1=50, p8=15, ps=TRUE)
+relax(rdp, ps=TRUE)
 ```
 
 ```{r, eval=FALSE}
