@@ -1,7 +1,7 @@
 Package: TreeAndLeaf
 Type: Package
 Title: Displaying binary trees with focus on dendrogram leaves
-Version: 1.5.2
+Version: 1.5.3
 Description: The TreeAndLeaf package combines unrooted and force-directed graph algorithms in order to layout binary trees, aiming to represent multiple layers of information onto dendrogram leaves.
 Author: Leonardo W. Kume, Luis E. A. Rizzardi, Milena A. Cardoso, Mauro A. A. Castro
 Maintainer: Milena A. Cardoso <milenandreuzo@gmail.com>

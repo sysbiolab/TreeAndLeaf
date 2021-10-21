@@ -66,7 +66,7 @@ treeAndLeaf <- function(obj){
     V(gg)$isLeaf <- V(gg)$name%in%coords$phylo$tip.label
     gg$centralVertex <- coords$centralVertex
     #--- set edge weights
-    E(gg)$weight <- 0
+    E(gg)$weight <- 0.01
     bt <- igraph::edge_betweenness(gg, directed = T)
     bt <- (1 - bt/max(bt))
     E(gg)$weight <- bt
