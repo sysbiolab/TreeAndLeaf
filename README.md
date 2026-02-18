@@ -1,5 +1,5 @@
 ### *TreeAndLeaf*: Displaying binary trees with focus on dendrogram leaves
-The TreeAndLeaf package combines tree and force-directed layout algorithms for drawing binary trees, aiming to represent multiple layers of information onto the leaves.
+ TreeAndLeaf implements a hybrid layout strategy that enhances leaf-level visualization in dendrograms. By integrating force-directed graph and tree layout algorithms, it enables projection of multiple layers of information onto graph–tree diagrams.
 
 ### Installation
 TreeAndLeaf is availble from the Bioconductor repository:
